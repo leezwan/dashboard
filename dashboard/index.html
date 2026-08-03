@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0d0d">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="2026-10-25 풀코스 sub 3:10 대시보드 · Garmin 실측">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
+<title>지환 Dashboard · 3:10 sub · D-day</title>
+<style>
+  :root{
+    color-scheme: dark;
+    /* 지면 */
+    --bg:#0d0d0d; --card:#161d21; --card2:#1b242a; --line:#26323a;
+    --ink:#ffffff; --ink2:#c3c2b7; --ink3:#898781;
+    --grid:#2c2c2a; --axis:#383835;
+    /* UI 크롬(데이터 색 아님) */
+    --accent:#38bda0; --accent-soft:#38bda022;
+    /* 상태 (예약 — 회복 판정 전용) */
+    --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+    /* 카테고리 시리즈 (검증됨: dark, surface #161d21) */
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    /* 서수 램프 — 파랑 단일 색상 (검증됨) */
+    --o1:#184f95; --o2:#256abf; --o3:#5598e7; --o4:#86b6ef; --o5:#b7d3f6;
+    --neutral:#55565a;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 64px}
+  header{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px 20px;margin-bottom:8px}
+  h1{font-size:22px;font-weight:700;margin:0;letter-spacing:-.2px}
+  .sub{color:var(--ink2);font-size:13px}
+  .stamp{margin-left:auto;color:var(--ink3);font-size:12px}
+
+  /* 히어로 */
+  .hero{background:linear-gradient(135deg,#152025,#12181b);
+    border:1px solid var(--line);border-radius:var(--radius);padding:22px 26px;margin:18px 0 22px}
+  .hero-top{display:flex;flex-wrap:wrap;align-items:center;gap:24px}
+  .dday{font-size:52px;font-weight:800;line-height:1;letter-spacing:-1px}
+  .hero .meta{display:flex;flex-direction:column;gap:4px}
+  .hero .meta b{font-size:15px}
+  .phasepill{display:inline-block;background:var(--accent-soft);color:var(--accent);
+    border:1px solid #38bda044;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:600}
+  .hero .goal{margin-left:auto;text-align:right}
+  .hero .goal .t{font-size:28px;font-weight:800;color:var(--accent)}
+  .hero .goal .l{font-size:12px;color:var(--ink3);text-transform:uppercase;letter-spacing:.6px}
+  .timeline{margin-top:20px}
+  .tl-track{display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+  .tl-seg{position:relative;display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:600;color:var(--ink2);background:#1b242a;border-right:2px solid var(--card)}
+  .tl-seg:last-child{border-right:none}
+  .tl-seg.cur{background:#22323a;color:var(--ink)}
+  .tl-marker{position:relative;height:10px;margin-top:4px}
+  .tl-marker i{position:absolute;top:0;transform:translateX(-50%);font-style:normal;
+    font-size:11px;color:var(--accent);font-weight:700;white-space:nowrap}
+
+  /* 타일 */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:26px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .tile .k{color:var(--ink3);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  .tile .v{font-size:26px;font-weight:700;margin-top:6px;letter-spacing:-.5px}
+  .tile .v small{font-size:13px;font-weight:500;color:var(--ink2)}
+  .tile .d{font-size:12px;margin-top:4px;color:var(--ink2)}
+  .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700}
+  .pill.good{background:#0ca30c22;color:var(--good)} .pill.warn{background:#fab21922;color:var(--warn)}
+  .pill.serious{background:#ec835a22;color:var(--serious)} .pill.crit{background:#d03b3b22;color:var(--crit)}
+
+  /* 섹션 */
+  .sec{margin:30px 0 0}
+  .sec > h2{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+    color:var(--ink3);margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid.one{grid-template-columns:1fr}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;min-width:0}
+  .panel h3{font-size:14px;font-weight:700;margin:0 0 4px;color:var(--ink)}
+  .panel .cap{font-size:12px;color:var(--ink3);margin:0 0 14px}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  .scroll::-webkit-scrollbar{height:6px}
+  .scroll::-webkit-scrollbar-thumb{background:#2f3b43;border-radius:3px}
+  .swipe{display:none;font-size:11px;color:var(--ink3);margin-top:6px}
+
+  /* 범례 */
+  .legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0;font-size:12px;color:var(--ink2)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{color:var(--ink3);font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  td{padding:8px;border-bottom:1px solid #1e262c;color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2)}
+  details{margin-top:12px}
+  summary{cursor:pointer;font-size:12px;color:var(--ink3)}
+  details table{margin-top:8px}
+
+  .note{margin-top:26px;padding:12px 16px;border:1px dashed #3a4a52;border-radius:10px;
+    color:var(--ink2);font-size:12.5px;background:#131a1e}
+  .axis{font-size:11px;fill:var(--ink3)}
+  .lbl{font-size:11px;fill:var(--ink2)}
+  .val{font-size:11px;font-weight:700;fill:var(--ink)}
+
+  /* ── 모바일 ──
+     SVG는 viewBox로 스케일되므로, 폰트 크기를 viewBox 단위에서 키워야
+     축소된 뒤에도 읽힌다. 좁은 차트(≤500)는 화면에 맞추고,
+     넓은 차트(≥900)는 가로 스크롤로 둔다 — 축소해서 담으면 글자가 뭉갠다. */
+  @media (max-width:700px){
+    .wrap{padding:18px 12px 48px}
+    h1{font-size:19px}
+    .stamp{margin-left:0;width:100%;order:3}
+    .hero{padding:18px 16px;margin:14px 0 18px}
+    .hero-top{gap:14px}
+    .dday{font-size:40px}
+    .hero .goal{margin-left:0;text-align:left;width:100%;
+      border-top:1px solid var(--line);padding-top:12px}
+    .hero .goal .t{font-size:24px}
+    .tiles{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+    .tile{padding:11px 12px}
+    .tile .v{font-size:22px}
+    .tile .d{font-size:11px;line-height:1.35}
+    .sec{margin-top:24px}
+    .grid{gap:12px}
+    .panel{padding:14px 12px}
+    .panel h3{font-size:13.5px}
+    .panel .cap{font-size:11px;margin-bottom:10px}
+    th{font-size:10px;padding:5px 4px}
+    td{font-size:12px;padding:7px 4px}
+    .tl-seg{font-size:10px}
+    svg.narrow{min-width:0 !important}
+    svg.wide{min-width:660px !important}
+    .axis,.lbl{font-size:15px}
+    .val{font-size:15px}
+    .swipe{display:block}
+  }
+  @media (max-width:400px){
+    .tiles{grid-template-columns:1fr 1fr}
+    .dday{font-size:34px}
+  }
+</style>
+</head>
+<body data-palette="#3987e5,#d95926,#199e70">
+<div class="wrap">
+  <header>
+    <h1>🏃 지환 Dashboard</h1>
+    <span class="sub" id="race-sub"></span>
+    <span class="stamp" id="stamp"></span>
+  </header>
+
+  <section class="hero">
+    <div class="hero-top">
+      <div class="dday" id="dday"></div>
+      <div class="meta">
+        <b id="racedate"></b>
+        <span class="phasepill" id="phase"></span>
+      </div>
+      <div class="goal">
+        <div class="t" id="goal-time"></div>
+        <div class="l">GOAL · <span id="goal-pace"></span></div>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="tl-track" id="tl-track"></div>
+      <div class="tl-marker" id="tl-marker"></div>
+    </div>
+  </section>
+
+  <section class="tiles" id="tiles"></section>
+
+  <section class="sec">
+    <h2>퍼포먼스</h2>
+    <div class="grid one">
+      <div class="panel">
+        <h3>Garmin 풀코스 예측 추세</h3>
+        <p class="cap">2026-05-01 ~ 오늘 · 목표선 3:07 / 상한선 3:10</p>
+        <div class="scroll" id="pred-chart"></div>
+        <div class="legend" id="pred-legend"></div>
+      </div>
+    </div>
+    <div class="grid" style="margin-top:16px">
+      <div class="panel">
+        <h3>VO₂max 추세</h3>
+        <p class="cap" id="vo2-range"></p>
+        <div class="scroll" id="vo2-chart"></div>
+      </div>
+      <div class="panel">
+        <h3>기록별 페이스 vs 목표 MP</h3>
+        <p class="cap">개인 최고기록 환산 페이스 · 점선 = 목표 MP 4:27</p>
+        <div class="scroll" id="pr-chart"></div>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:16px">
+      <div class="panel">
+        <h3>역치 대비 목표 페이스</h3>
+        <p class="cap" id="thr-cap"></p>
+        <div class="scroll" id="thr-chart"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>트레이닝 로드</h2>
+    <div class="grid">
+      <div class="panel">
+        <h3>월간 로드 밸런스</h3>
+        <p class="cap">막대 = 실측 · 밝은 구간 = Garmin 목표 밴드</p>
+        <div class="scroll" id="lb-chart"></div>
+      </div>
+      <div class="panel">
+        <h3>급성 부하 추세</h3>
+        <p class="cap" id="acwr-cap"></p>
+        <div class="scroll" id="load-chart"></div>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:16px">
+      <div class="panel">
+        <h3>심박 존 분포</h3>
+        <p class="cap">최근 28일 러닝 · Garmin 개인 존 설정 기준</p>
+        <div class="scroll" id="zone-chart"></div>
+        <div class="legend" id="zone-legend"></div>
+        <details><summary>데이터 표</summary><div id="zone-table"></div></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>마일리지</h2>
+    <div class="tiles" id="mil-tiles" style="margin-bottom:16px"></div>
+    <div class="grid one">
+      <div class="panel">
+        <h3>최근 7일 · 일자별 운동량</h3>
+        <p class="cap" id="l7-cap"></p>
+        <div class="scroll" id="l7-chart"></div>
+        <div class="legend" id="l7-legend"></div>
+        <details><summary>데이터 표</summary><div id="l7-table"></div></details>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:16px">
+      <div class="panel">
+        <h3>월별 마일리지</h3>
+        <p class="cap">완료 12개월 + 진행 중인 이번 달 · 점선 = 완료 12개월 월평균 · 마지막 흐린 막대가 진행 중</p>
+        <div class="scroll" id="month-chart"></div>
+        <details><summary>데이터 표</summary><div id="month-table"></div></details>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:16px">
+      <div class="panel">
+        <h3>주별 마일리지 · 이지 / 질 분리</h3>
+        <p class="cap">최근 12주 · 질 = 무산소TE ≥ 1.5 또는 평균 4:50/km 이내 · 흐린 막대(W31)는 진행 중, 평균선에서 제외</p>
+        <div class="scroll" id="vol-chart"></div>
+        <div class="legend" id="vol-legend"></div>
+        <details><summary>데이터 표</summary><div id="vol-table"></div></details>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:16px">
+      <div class="panel">
+        <h3>일별 마일리지</h3>
+        <p class="cap">최근 31일 · 회색 = 휴식일 · 점선 = 러닝일 평균</p>
+        <div class="scroll" id="day-chart"></div>
+        <details><summary>데이터 표</summary><div id="day-table"></div></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>회복</h2>
+    <div class="grid one">
+      <div class="panel">
+        <h3>회복 지표 3종</h3>
+        <p class="cap">최근 10일 · 축이 서로 달라 3단 분할로 표시 (7/18~7/20 기기 미착용)</p>
+        <div class="scroll" id="rec-chart"></div>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:16px">
+      <div class="panel">
+        <h3>수면 구성과 취침 시각</h3>
+        <p class="cap">최근 10일 · 점선 = 7시간 기준선 · ● = 취침 시각</p>
+        <div class="scroll" id="sleep-chart"></div>
+        <div class="legend" id="sleep-legend"></div>
+        <details><summary>데이터 표</summary><div id="sleep-table"></div></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>근력</h2>
+    <div class="grid">
+      <div class="panel">
+        <h3>주간 근력 세트 · 부위별</h3>
+        <p class="cap">Garmin 종목 자동 분류 · 점선 = 주간 목표 세트</p>
+        <div class="scroll" id="str-chart"></div>
+        <div class="legend" id="str-legend"></div>
+        <details><summary>데이터 표</summary><div id="str-table"></div></details>
+      </div>
+      <div class="panel">
+        <h3>근력 플랜 <span style="color:var(--ink3);font-weight:500;font-size:12px" id="str-start"></span></h3>
+        <p class="cap">주 2회 분할 · 러닝 뒤에 배치 · 금요일·롱런 당일 금지</p>
+        <table id="strplan"><thead><tr><th>구분</th><th>종목</th><th class="num">세트×횟수</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>러닝 플랜</h2>
+    <div class="grid">
+      <div class="panel">
+        <h3>이번 주 <span style="color:var(--ink3);font-weight:500;font-size:12px" id="week-phase"></span></h3>
+        <table id="week"><thead><tr><th>요일</th><th>세션</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="panel">
+        <h3>다음 주 <span style="color:var(--ink3);font-weight:500;font-size:12px" id="week-phase-next"></span></h3>
+        <table id="week-next"><thead><tr><th>요일</th><th>세션</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>최근 활동</h2>
+    <div class="grid one">
+      <div class="panel">
+        <table id="acts"><thead><tr><th>날짜</th><th>종류</th><th class="num">거리</th><th class="num">페이스</th><th class="num">평균HR</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <div class="note" id="note"></div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   DATA — Garmin Connect MCP 실측 (계정 zwanlee / 지환).
+   /dashboard 재실행 시 이 블록만 최신 실측으로 교체됩니다.
+   ───────────────────────────────────────────────────────────── */
+const DATA = {
+  isSample: false,
+  generatedAt: "2026-08-03 (Garmin 실측)",
+  raceDate: "2026-10-25",
+  dDay: 83,
+  phase: "베이스 W3",
+  goal: { time: "3:07~3:08", pace: "4:27/km · 상한 3:10" },
+
+  // 4단계 타임라인 (일수 기준, 총 96일)
+  phases: [
+    {n:"베이스", d:28, r:"7/22–8/18"},
+    {n:"빌드",   d:35, r:"8/19–9/22"},
+    {n:"피크",   d:19, r:"9/23–10/11"},
+    {n:"테이퍼", d:14, r:"10/12–10/25"},
+  ],
+  elapsedDays: 13,   // 7/22 = 1일차, 오늘 8/3 = 13일차
+
+  metrics: [
+    { k:"트레이닝 준비도", v:"68", unit:"", d:"MODERATE · 회복 6.5h · 10일 만의 최고", status:"good" },
+    { k:"HRV", v:"64", unit:"ms", d:"10일 최고 · 요인 100 VERY_GOOD (밴드 46–65)", status:"good" },
+    { k:"수면 점수", v:"76", unit:"", d:"FAIR · 7h07m · 취침 23:08 (자정 전 복귀)", status:"warn" },
+    { k:"안정시 심박", v:"48", unit:"bpm", d:"최근 4일 중 3일 48 · 기준선 43", status:"warn" },
+    { k:"바디배터리", v:"60", unit:"", d:"MODERATE · 최고 83", status:"warn" },
+    { k:"트레이닝 상태", v:"MAINTAINING", unit:"", d:"5일째 · ACWR 0.8 (부하 감소)", status:null },
+    { k:"고강도 유산소 로드", v:"880", unit:"", d:"975 → 880, 하한 837에 근접 ⚠", status:null },
+    { k:"VO₂max", v:"55.0", unit:"", d:"7/15 55.6 피크 후 하락", status:null },
+    { k:"풀코스 예측", v:"3:23:27", unit:"", d:"목표 3:07~08까지 −16분", status:null },
+    { k:"젖산 역치", v:"4:21", unit:"/km", d:"LTHR 161 · MP목표와 6초 차", status:null },
+  ],
+
+  // 예측 추세 (초). 주 1회 샘플링
+  predictionTrend: [
+    {d:"5/01",v:11839},{d:"5/10",v:11879},{d:"5/20",v:11918},{d:"5/31",v:12002},
+    {d:"6/10",v:12094},{d:"6/20",v:12168},{d:"6/30",v:12170},{d:"7/10",v:12147},
+    {d:"7/18",v:12066},{d:"7/25",v:12122},{d:"7/31",v:12193},{d:"8/03",v:12207},
+  ],
+  goalSec: 11220,   // 3:07:00
+  capSec:  11400,   // 3:10:00
+
+  vo2maxTrend: [
+    {d:"5/02",v:53.3},{d:"5/18",v:54.2},{d:"6/02",v:53.5},
+    {d:"6/17",v:54.5},{d:"7/02",v:55.0},{d:"7/15",v:55.6},{d:"7/29",v:55.0},
+  ],
+
+  // 기록별 페이스 (초/km)
+  prPace: [
+    {k:"1km PR",   p:225, t:"3:45", note:"3:44.7 · 2024-07"},
+    {k:"5K PR",    p:242, t:"4:02", note:"20:08 · 2025-06"},
+    {k:"10K PR",   p:262, t:"4:22", note:"43:36 · 2025-04"},
+    {k:"하프 PR",  p:271, t:"4:31", note:"1:35:17 · 2025-11"},
+    {k:"풀 PR",    p:281, t:"4:41", note:"3:17:51 · 2026-03 동마"},
+  ],
+  mpTarget: 267,   // 4:27/km
+
+  threshold: { ltPace:261, ltHr:161, mpTarget:267, halfPr:271, typicalGapMin:15, typicalGapMax:25 },
+
+  loadBalance: [
+    {k:"저강도 유산소", v:1630, min:698, max:1535},
+    {k:"고강도 유산소", v:880,  min:837, max:1675},
+    {k:"무산소",        v:394,  min:279, max:837},
+  ],
+
+  loadTrend: [
+    {d:"7/25",v:853},{d:"7/26",v:713},{d:"7/27",v:688},{d:"7/28",v:734},{d:"7/29",v:1187},
+    {d:"7/30",v:1005},{d:"7/31",v:978},{d:"8/01",v:801},{d:"8/02",v:827},{d:"8/03",v:668},
+  ],
+  chronicLoad: 792,
+  acwr: 0.8,
+
+  // ── 마일리지 ──
+  mileageStats: [
+    {k:"이번 달 (8월)", v:"12.0",  u:"km", d:"2회 · 8/3 기준"},
+    {k:"최근 30일",     v:"234.7", u:"km", d:"러닝 20일 / 휴식 11일"},
+    {k:"최근 7일",      v:"46.4",  u:"km", d:"7/28–8/3 · 러닝 4일"},
+    {k:"최근 12개월",   v:"2,492", u:"km", d:"월평균 207.6km"},
+  ],
+  // 최근 7일 · 일자별 러닝 거리(km) / 러닝 시간(분) / 근력 시간(분)
+  last7: [
+    {d:"7/28",w:"화",km:10.3,run:56.4, str:0},
+    {d:"7/29",w:"수",km:17.1,run:102.1,str:46.3},
+    {d:"7/30",w:"목",km:0,   run:0,    str:0},
+    {d:"7/31",w:"금",km:7.0, run:47.5, str:15.8},
+    {d:"8/01",w:"토",km:0,   run:0,    str:0},
+    {d:"8/02",w:"일",km:12.0,run:75.8, str:27.6},
+    {d:"8/03",w:"월",km:0,   run:0,    str:0},
+  ],
+
+  monthlyVolume: [ // 완료 12개월 + 진행 중인 26-08 (n = 러닝 횟수)
+    {m:"25-08",km:273.1,n:29},{m:"25-09",km:248.7,n:29},{m:"25-10",km:232.0,n:27},
+    {m:"25-11",km:208.2,n:31},{m:"25-12",km:172.6,n:20},{m:"26-01",km:215.0,n:19},
+    {m:"26-02",km:156.5,n:19},{m:"26-03",km:207.7,n:25},{m:"26-04",km:175.4,n:19},
+    {m:"26-05",km:166.9,n:21},{m:"26-06",km:192.2,n:25},{m:"26-07",km:243.2,n:33},
+    {m:"26-08",km:12.0,n:2},
+  ],
+  monthlyAvg: 207.6,   // 완료 12개월(25-08~26-07) 평균
+
+  // 주간 볼륨 (e=이지, q=질)
+  weeklyVolume: [
+    {w:"W21",e:39.1,q:2.0},{w:"W22",e:25.6,q:0},{w:"W23",e:38.2,q:0},{w:"W24",e:42.3,q:7.0},
+    {w:"W25",e:36.4,q:0},{w:"W26",e:46.4,q:9.0},{w:"W27",e:56.7,q:6.9},{w:"W28",e:39.1,q:0},
+    {w:"W29",e:46.9,q:9.4},{w:"W30",e:53.0,q:3.4},{w:"W31",e:45.5,q:7.3},{w:"W32",e:0,q:0},
+  ],
+
+  dailyVolume: [ // 최근 31일 (7/04–8/03) · 0 = 휴식일
+    {d:"7/04",km:0},{d:"7/05",km:30.0},{d:"7/06",km:10.2},{d:"7/07",km:0},{d:"7/08",km:3.8},
+    {d:"7/09",km:10.0},{d:"7/10",km:5.1},{d:"7/11",km:0},{d:"7/12",km:10.0},{d:"7/13",km:0},
+    {d:"7/14",km:10.1},{d:"7/15",km:10.2},{d:"7/16",km:10.2},{d:"7/17",km:0},{d:"7/18",km:25.8},
+    {d:"7/19",km:0},{d:"7/20",km:10.4},{d:"7/21",km:7.5},{d:"7/22",km:12.5},{d:"7/23",km:0},
+    {d:"7/24",km:5.0},{d:"7/25",km:21.0},{d:"7/26",km:0},{d:"7/27",km:6.4},{d:"7/28",km:10.3},
+    {d:"7/29",km:17.1},{d:"7/30",km:0},{d:"7/31",km:7.0},{d:"8/01",km:0},{d:"8/02",km:12.0},
+    {d:"8/03",km:0},
+  ],
+
+  hrZones: [
+    {k:"Zone 1",v:4973},{k:"Zone 2",v:22777},{k:"Zone 3",v:27310},
+    {k:"Zone 4",v:12234},{k:"Zone 5",v:3030},
+  ],
+
+  recovery: [
+    {d:"7/25",readiness:27,hrv:62,rhr:43},
+    {d:"7/26",readiness:50,hrv:48,rhr:43},
+    {d:"7/27",readiness:62,hrv:49,rhr:45},
+    {d:"7/28",readiness:59,hrv:53,rhr:44},
+    {d:"7/29",readiness:13,hrv:57,rhr:47},
+    {d:"7/30",readiness:5, hrv:45,rhr:48},
+    {d:"7/31",readiness:43,hrv:50,rhr:46},
+    {d:"8/01",readiness:50,hrv:41,rhr:48},
+    {d:"8/02",readiness:56,hrv:51,rhr:47},
+    {d:"8/03",readiness:68,hrv:64,rhr:48},
+  ],
+  hrvBand: {low:46, high:65},
+
+  // 수면 (초 단위), bed = 취침 시각(분, 자정 기준 오프셋 — 음수는 자정 이전)
+  sleep: [
+    {d:"7/25",score:76,deep:5400,light:10980,rem:4740,awake:60,  bed:-50},
+    {d:"7/26",score:76,deep:2700,light:17880,rem:4080,awake:240, bed:-22},
+    {d:"7/27",score:75,deep:5580,light:18420,rem:2280,awake:720, bed:-66},
+    {d:"7/28",score:80,deep:5160,light:12660,rem:4740,awake:0,   bed:-30},
+    {d:"7/29",score:75,deep:4020,light:15960,rem:2880,awake:300, bed:-98},
+    {d:"7/30",score:63,deep:8100,light:12120,rem:1320,awake:300, bed:60},
+    {d:"7/31",score:79,deep:4560,light:15720,rem:5400,awake:1200,bed:37},
+    {d:"8/01",score:66,deep:4500,light:13980,rem:3720,awake:3180,bed:55},
+    {d:"8/02",score:73,deep:7560,light:12300,rem:2460,awake:360, bed:19},
+    {d:"8/03",score:76,deep:3780,light:19560,rem:2280,awake:0,   bed:-52},
+  ],
+
+  // 근력 — 주간 부위별 세트
+  strengthWeeks: [
+    {w:"W29",u:11,l:2,c:0},{w:"W30",u:6,l:0,c:0},{w:"W31",u:7,l:1,c:0},{w:"W32",u:0,l:0,c:0},
+  ],
+  strengthTarget: {u:6, l:6, c:4},
+  strengthStart: "오늘(8/3, W3)부터 적용",
+  strengthPlan: [
+    {g:"A · 하체", n:"백스쿼트 (또는 고블릿)", s:"3 × 12–15"},
+    {g:"A · 하체", n:"루마니안 데드리프트", s:"3 × 12"},
+    {g:"A · 하체", n:"불가리안 스플릿 스쿼트", s:"3 × 10/측"},
+    {g:"A · 하체", n:"싱글 카프레이즈", s:"3 × 15/측"},
+    {g:"A · 하체", n:"싱글 글루트 브릿지", s:"3 × 12/측"},
+    {g:"B · 상체", n:"푸시업", s:"3 × 15"},
+    {g:"B · 상체", n:"인버티드 로우 / 덤벨 로우", s:"3 × 12"},
+    {g:"B · 상체", n:"숄더 프레스", s:"3 × 12"},
+    {g:"B · 코어", n:"플랭크", s:"3 × 45초"},
+    {g:"B · 코어", n:"사이드 플랭크", s:"3 × 30초/측"},
+    {g:"B · 코어", n:"데드버그", s:"3 × 12/측"},
+  ],
+
+  weekLabel: "베이스 W3 · 8/3–8/9 (근력 도입)",
+  weekPlan: [
+    {d:"월",s:"파틀렉 wu2km + 8×(2분 @4:12 / float 90s) + cd2km ~11km — 준비도 68, 실행 조건 충족"},
+    {d:"화",s:"이지 9km + 스트라이드 6×100m · 근력 B(상체·코어)"},
+    {d:"수",s:"인터벌(클럽) · 근력 A(하체) — 러닝 뒤"},
+    {d:"목",s:"이지 7km @5:40–6:00 상한 엄수"},
+    {d:"금",s:"휴식 — 근력 금지"},
+    {d:"토",s:"거리주(클럽) 26km, 후반 8km @MP 4:27 — 2주 연속 결장 금지 ⚠"},
+    {d:"일",s:"리커버리 7km @6:15"},
+  ],
+  weekNextLabel: "베이스 W4 · 8/10–8/16 (회복주 −25%)",
+  weekPlanNext: [
+    {d:"월",s:"파틀렉(축소) wu2km + 5×(90초 @4:10 / float 90초) + cd2km ~9km"},
+    {d:"화",s:"이지 7km · 근력 B(상체·코어)"},
+    {d:"수",s:"인터벌(클럽, 볼륨 축소) 또는 이지 8km · 근력 A(하체)"},
+    {d:"목",s:"휴식 또는 이지 5km + 스트라이드 4×100m"},
+    {d:"금",s:"휴식"},
+    {d:"토",s:"거리주 20km 이지(5:30–5:50) — MP 없음, 피로 흡수"},
+    {d:"일",s:"리커버리 6km"},
+  ],
+
+  recentActivities: [
+    {date:"08-02",type:"이지런",dist:"7.0 km",pace:"5:49",hr:130},
+    {date:"08-02",type:"리커버리(트레드밀)",dist:"5.0 km",pace:"6:57",hr:120},
+    {date:"08-02",type:"근력 (상체 3세트)",dist:"28분",pace:"—",hr:98},
+    {date:"08-01",type:"완전 휴식 — 거리주 결장 ⚠",dist:"—",pace:"—",hr:"—"},
+    {date:"07-31",type:"이지(트레드밀)",dist:"7.0 km",pace:"6:46",hr:128},
+    {date:"07-29",type:"인터벌 2세트(트랙)",dist:"3.4 km",pace:"4:18",hr:162},
+  ],
+};
+
+/* ══════════════════════════ 렌더 ══════════════════════════ */
+const $ = s => document.querySelector(s);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hms = s => `${Math.floor(s/3600)}:${String(Math.floor(s%3600/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+const mmss = s => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,"0")}`;
+const hm = s => `${Math.floor(s/3600)}h${String(Math.round(s%3600/60)).padStart(2,"0")}m`;
+// 넓은 차트(≥900)는 모바일에서 가로 스크롤, 좁은 차트는 화면에 맞춰 축소된다 (CSS 미디어쿼리 참조)
+const svgOpen = (w,h,label) => `<svg class="${w>=900?"wide":"narrow"}" viewBox="0 0 ${w} ${h}" width="100%" style="min-width:${Math.min(w,520)}px" role="img" aria-label="${esc(label)}">`;
+const legend = (items) => items.map(i=>`<span><i style="background:${i.c}"></i>${esc(i.t)}</span>`).join("");
+const tbl = (head, rows) =>
+  `<table><thead><tr>${head.map((h,i)=>`<th${i?' class="num"':''}>${esc(h)}</th>`).join("")}</tr></thead><tbody>`+
+  rows.map(r=>`<tr>${r.map((c,i)=>`<td${i?' class="num"':''}>${esc(c)}</td>`).join("")}</tr>`).join("")+`</tbody></table>`;
+
+/* ── 헤더 / 히어로 ── */
+$("#dday").textContent = `D-${DATA.dDay}`;
+$("#racedate").textContent = `레이스 ${DATA.raceDate}`;
+$("#race-sub").textContent = "sub 3:10 · 주 5회";
+$("#phase").textContent = DATA.phase;
+$("#goal-time").textContent = DATA.goal.time;
+$("#goal-pace").textContent = DATA.goal.pace;
+$("#stamp").textContent = `업데이트 ${DATA.generatedAt}` + (DATA.isSample ? " · SAMPLE 데이터" : "");
+$("#vo2-range").textContent = `${DATA.vo2maxTrend[0].d} – ${DATA.vo2maxTrend.at(-1).d}`;
+$("#week-phase").textContent = DATA.weekLabel;
+$("#week-phase-next").textContent = DATA.weekNextLabel;
+$("#str-start").textContent = DATA.strengthStart;
+$("#thr-cap").textContent =
+  `LTHR ${DATA.threshold.ltHr} · 통상 MP는 역치보다 ${DATA.threshold.typicalGapMin}~${DATA.threshold.typicalGapMax}초 느리다`;
+$("#acwr-cap").textContent = `최근 10일 · 만성 부하 ${DATA.chronicLoad} · ACWR ${DATA.acwr} (OPTIMAL)`;
+
+/* 단계 타임라인 */
+(function(){
+  const total = DATA.phases.reduce((a,p)=>a+p.d,0);
+  let acc = 0, curIdx = -1;
+  DATA.phases.forEach((p,i)=>{ const s=acc+1, e=acc+p.d; if(DATA.elapsedDays>=s && DATA.elapsedDays<=e) curIdx=i; acc=e; });
+  $("#tl-track").innerHTML = DATA.phases.map((p,i)=>
+    `<div class="tl-seg${i===curIdx?' cur':''}" style="flex:${p.d}" title="${esc(p.n)} · ${esc(p.r)} · ${p.d}일">${esc(p.n)}</div>`).join("");
+  const pct = (DATA.elapsedDays/total*100).toFixed(1);
+  $("#tl-marker").innerHTML = `<i style="left:${pct}%">▲ 오늘 (${DATA.elapsedDays}/${total}일)</i>`;
+})();
+
+/* 타일 */
+$("#tiles").innerHTML = DATA.metrics.map(m=>`
+  <div class="tile">
+    <div class="k">${esc(m.k)}</div>
+    <div class="v">${esc(m.v)}${m.unit?` <small>${esc(m.unit)}</small>`:""}</div>
+    <div class="d">${m.status?`<span class="pill ${m.status}">${esc(m.d)}</span>`:esc(m.d)}</div>
+  </div>`).join("");
+
+/* ── 1. 예측 추세 (라인 + 기준선 2개) ── */
+(function(){
+  const data=DATA.predictionTrend, W=1000,H=250,pad={t:20,r:70,b:30,l:56};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const vs=data.map(d=>d.v).concat([DATA.goalSec]);
+  const min=Math.min(...vs)-90, max=Math.max(...vs)+90;
+  const x=i=>pad.l+iw*i/(data.length-1||1), y=v=>pad.t+ih-((v-min)/(max-min))*ih;
+  let s=svgOpen(W,H,"풀코스 예측 추세");
+  // y축
+  for(let k=0;k<=4;k++){ const v=min+(max-min)*k/4, yy=y(v);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+    s+=`<text class="axis" x="${pad.l-8}" y="${yy+4}" text-anchor="end">${hms(Math.round(v))}</text>`; }
+  // 목표선 / 상한선
+  [[DATA.goalSec,"목표 3:07",css('--good')],[DATA.capSec,"상한 3:10",css('--warn')]].forEach(([v,t,c])=>{
+    if(v<min||v>max) return;
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${c}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    s+=`<text class="lbl" x="${W-pad.r+6}" y="${y(v)+4}" fill="${c}">${t}</text>`; });
+  // 라인
+  s+=`<polyline points="${data.map((d,i)=>`${x(i)},${y(d.v)}`).join(" ")}" fill="none" stroke="${css('--s1')}" stroke-width="2" stroke-linejoin="round"/>`;
+  data.forEach((d,i)=>{
+    s+=`<circle cx="${x(i)}" cy="${y(d.v)}" r="4.5" fill="${css('--s1')}" stroke="${css('--card')}" stroke-width="2"><title>${d.d}: ${hms(d.v)}</title></circle>`;
+    s+=`<text class="axis" x="${x(i)}" y="${H-10}" text-anchor="middle">${d.d}</text>`; });
+  // 처음/끝만 직접 라벨
+  [0,data.length-1].forEach(i=>{ s+=`<text class="val" x="${x(i)}" y="${y(data[i].v)-11}" text-anchor="middle">${hms(data[i].v)}</text>`; });
+  $("#pred-chart").innerHTML=s+"</svg>";
+  $("#pred-legend").innerHTML = legend([{c:css('--s1'),t:"Garmin 풀코스 예측"},{c:css('--good'),t:"목표 3:07:00"},{c:css('--warn'),t:"상한 3:10:00"}]);
+})();
+
+/* ── 2. VO2max ── */
+(function(){
+  const data=DATA.vo2maxTrend, W=460,H=200,pad={t:20,r:16,b:28,l:34};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const vs=data.map(d=>d.v), min=Math.min(...vs)-1.5, max=Math.max(...vs)+1.5;
+  const x=i=>pad.l+iw*i/(data.length-1||1), y=v=>pad.t+ih-((v-min)/(max-min))*ih;
+  let s=svgOpen(W,H,"VO2max 추세");
+  [min,(min+max)/2,max].forEach(v=>{const yy=y(v);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+    s+=`<text class="axis" x="${pad.l-6}" y="${yy+3}" text-anchor="end">${v.toFixed(1)}</text>`;});
+  s+=`<polyline points="${data.map((d,i)=>`${x(i)},${y(d.v)}`).join(" ")}" fill="none" stroke="${css('--s1')}" stroke-width="2" stroke-linejoin="round"/>`;
+  data.forEach((d,i)=>{
+    s+=`<circle cx="${x(i)}" cy="${y(d.v)}" r="4.5" fill="${css('--s1')}" stroke="${css('--card')}" stroke-width="2"><title>${d.d}: ${d.v}</title></circle>`;
+    s+=`<text class="axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${d.d}</text>`;});
+  [0,data.length-1].forEach(i=>{ s+=`<text class="val" x="${x(i)}" y="${y(data[i].v)-10}" text-anchor="middle">${data[i].v}</text>`; });
+  $("#vo2-chart").innerHTML=s+"</svg>";
+})();
+
+/* ── 3. PR 페이스 (가로 막대 + 목표 기준선) ── */
+(function(){
+  const data=DATA.prPace, W=460, rowH=30, pad={t:12,r:14,b:26,l:74};
+  const H=pad.t+data.length*rowH+pad.b, iw=W-pad.l-pad.r;
+  const max=Math.max(...data.map(d=>d.p), DATA.mpTarget)+14;
+  const min=Math.min(...data.map(d=>d.p), DATA.mpTarget)-20;
+  const x=v=>pad.l+iw*(v-min)/(max-min);
+  let s=svgOpen(W,H,"기록별 페이스");
+  data.forEach((d,i)=>{
+    const yy=pad.t+i*rowH, bh=16;
+    s+=`<text class="lbl" x="${pad.l-8}" y="${yy+bh-3}" text-anchor="end">${esc(d.k)}</text>`;
+    s+=`<rect x="${pad.l}" y="${yy}" width="${Math.max(x(d.p)-pad.l,2)}" height="${bh}" rx="4" fill="${css('--s1')}"><title>${esc(d.k)} ${d.t}/km — ${esc(d.note)}</title></rect>`;
+    s+=`<text class="val" x="${x(d.p)+7}" y="${yy+bh-3}">${d.t}</text>`;});
+  const gx=x(DATA.mpTarget);
+  s+=`<line x1="${gx}" x2="${gx}" y1="${pad.t-6}" y2="${pad.t+data.length*rowH}" stroke="${css('--warn')}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  s+=`<text class="lbl" x="${gx}" y="${H-8}" text-anchor="middle" fill="${css('--warn')}">목표 MP ${mmss(DATA.mpTarget)}</text>`;
+  $("#pr-chart").innerHTML=s+"</svg>";
+})();
+
+/* ── 4. 역치 vs 목표 페이스 (수평 스케일) ── */
+(function(){
+  const t=DATA.threshold, W=1000,H=150;
+  const min=250, max=300, pad={l:40,r:40};
+  const iw=W-pad.l-pad.r, x=v=>pad.l+iw*(v-min)/(max-min);
+  let s=svgOpen(W,H,"역치 대비 목표 페이스");
+  // 적정 MP 밴드
+  const bandA=x(t.ltPace+t.typicalGapMin), bandB=x(t.ltPace+t.typicalGapMax);
+  s+=`<rect x="${bandA}" y="46" width="${bandB-bandA}" height="30" rx="4" fill="${css('--s3')}" opacity="0.3"/>`;
+  s+=`<text class="lbl" x="${(bandA+bandB)/2}" y="94" text-anchor="middle" fill="${css('--s3')}">현재 체력의 적정 MP 구간</text>`;
+  s+=`<text class="lbl" x="${(bandA+bandB)/2}" y="110" text-anchor="middle" fill="${css('--s3')}">${mmss(t.ltPace+t.typicalGapMin)} – ${mmss(t.ltPace+t.typicalGapMax)}</text>`;
+  // 축
+  s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="61" y2="61" stroke="${css('--axis')}"/>`;
+  for(let v=min;v<=max;v+=10){ s+=`<line x1="${x(v)}" x2="${x(v)}" y1="57" y2="65" stroke="${css('--axis')}"/>`;
+    s+=`<text class="axis" x="${x(v)}" y="132" text-anchor="middle">${mmss(v)}</text>`; }
+  // 마커
+  const marks=[
+    {v:t.ltPace,  t:"젖산역치 4:21", c:css('--s1'), up:true},
+    {v:t.mpTarget,t:"목표 MP 4:27",  c:css('--crit'), up:false},
+    {v:t.halfPr,  t:"하프 PR 4:31",  c:css('--s2'), up:true},
+  ];
+  marks.forEach(m=>{
+    const mx=x(m.v);
+    s+=`<line x1="${mx}" x2="${mx}" y1="${m.up?26:61}" y2="${m.up?61:96}" stroke="${m.c}" stroke-width="2"/>`;
+    s+=`<circle cx="${mx}" cy="61" r="6" fill="${m.c}" stroke="${css('--card')}" stroke-width="2"><title>${esc(m.t)}</title></circle>`;
+    s+=`<text class="val" x="${mx}" y="${m.up?20:112}" text-anchor="middle" fill="${m.c}">${esc(m.t)}</text>`;});
+  $("#thr-chart").innerHTML=s+"</svg>";
+})();
+
+/* ── 5. 로드 밸런스 (가로 막대 + 목표 밴드) ── */
+(function(){
+  const data=DATA.loadBalance, W=460, rowH=52, pad={t:14,r:16,b:16,l:16};
+  const H=pad.t+data.length*rowH+pad.b, iw=W-pad.l-pad.r;
+  const max=Math.max(...data.map(d=>Math.max(d.v,d.max)))*1.06;
+  const x=v=>pad.l+iw*v/max;
+  let s=svgOpen(W,H,"월간 로드 밸런스");
+  data.forEach((d,i)=>{
+    const yy=pad.t+i*rowH, bh=15;
+    const over=d.v>d.max, under=d.v<d.min;
+    const c = over?css('--warn') : under?css('--crit') : css('--s1');
+    s+=`<text class="lbl" x="${pad.l}" y="${yy+10}">${esc(d.k)}</text>`;
+    s+=`<text class="val" x="${W-pad.r}" y="${yy+10}" text-anchor="end" fill="${c}">${d.v}${over?" ↑상한 초과":under?" ↓하한 미달":" 적정"}</text>`;
+    // 목표 밴드
+    s+=`<rect x="${x(d.min)}" y="${yy+16}" width="${x(d.max)-x(d.min)}" height="${bh+8}" rx="4" fill="${css('--neutral')}" opacity="0.35"/>`;
+    // 실측 막대
+    s+=`<rect x="${pad.l}" y="${yy+20}" width="${Math.max(x(d.v)-pad.l,2)}" height="${bh}" rx="4" fill="${c}"><title>${esc(d.k)} ${d.v} (목표 ${d.min}–${d.max})</title></rect>`;
+    s+=`<text class="axis" x="${x(d.min)}" y="${yy+50}" text-anchor="middle">${d.min}</text>`;
+    s+=`<text class="axis" x="${x(d.max)}" y="${yy+50}" text-anchor="middle">${d.max}</text>`;});
+  $("#lb-chart").innerHTML=s+"</svg>";
+})();
+
+/* ── 6. 급성 부하 추세 ── */
+(function(){
+  const data=DATA.loadTrend, W=460,H=200,pad={t:20,r:14,b:28,l:42};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const max=Math.max(...data.map(d=>d.v), DATA.chronicLoad)*1.12, min=0;
+  const x=i=>pad.l+iw*i/(data.length-1||1), y=v=>pad.t+ih-((v-min)/(max-min))*ih;
+  let s=svgOpen(W,H,"급성 부하 추세");
+  [0,max/2,max].forEach(v=>{const yy=y(v);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+    s+=`<text class="axis" x="${pad.l-6}" y="${yy+3}" text-anchor="end">${Math.round(v)}</text>`;});
+  const cy=y(DATA.chronicLoad);
+  s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${cy}" y2="${cy}" stroke="${css('--s2')}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  s+=`<text class="lbl" x="${pad.l+4}" y="${cy-6}" fill="${css('--s2')}">만성 ${DATA.chronicLoad}</text>`;
+  s+=`<polyline points="${data.map((d,i)=>`${x(i)},${y(d.v)}`).join(" ")}" fill="none" stroke="${css('--s1')}" stroke-width="2" stroke-linejoin="round"/>`;
+  data.forEach((d,i)=>{
+    s+=`<circle cx="${x(i)}" cy="${y(d.v)}" r="4" fill="${css('--s1')}" stroke="${css('--card')}" stroke-width="2"><title>${d.d}: 급성 ${d.v}</title></circle>`;
+    if(i%2===0||i===data.length-1) s+=`<text class="axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${d.d}</text>`;});
+  s+=`<text class="val" x="${x(data.length-1)}" y="${y(data.at(-1).v)-10}" text-anchor="end">${data.at(-1).v}</text>`;
+  $("#load-chart").innerHTML=s+"</svg>";
+})();
+
+/* ── 마일리지 요약 타일 ── */
+$("#mil-tiles").innerHTML = DATA.mileageStats.map(m=>`
+  <div class="tile"><div class="k">${esc(m.k)}</div>
+  <div class="v">${esc(m.v)} <small>${esc(m.u)}</small></div>
+  <div class="d">${esc(m.d)}</div></div>`).join("");
+
+/* ── 7z. 최근 7일 — 한 패널, x축 공유 2단 분할.
+      거리(km)와 시간(분)은 단위가 달라 y축을 합칠 수 없다(이중 축 금지). ── */
+(function(){
+  const data=DATA.last7;
+  const hhmm = m => m>=60 ? `${Math.floor(m/60)}시간 ${Math.round(m%60)}분` : `${Math.round(m)}분`;
+  const sumKm=data.reduce((a,d)=>a+d.km,0), sumRun=data.reduce((a,d)=>a+d.run,0), sumStr=data.reduce((a,d)=>a+d.str,0);
+  const restDays=data.filter(d=>d.km===0&&d.str===0).length;
+  $("#l7-cap").textContent =
+    `러닝 ${sumKm.toFixed(1)}km · ${hhmm(sumRun)} + 근력 ${hhmm(sumStr)} = 총 ${hhmm(sumRun+sumStr)} · 완전 휴식 ${restDays}일`
+    + ` · 단위가 달라 위(km)·아래(분) 축을 나눴다`;
+
+  const W=1000, bandH=132, pad={t:18,r:78,b:34,l:48};
+  const H=pad.t+bandH*2+pad.b, iw=W-pad.l-pad.r;
+  const bw=iw/data.length*0.5;
+  const cxOf=i=>pad.l+iw*(i+0.5)/data.length;
+
+  const bands=[
+    { t:"러닝 거리 (km)", max:Math.max(...data.map(d=>d.km))*1.22,
+      total:v=>v.km, fmt:v=>v.toFixed(1),
+      segs:d=>d.km>0 ? [{v:d.km,c:css('--s1'),n:"거리",u:"km"}] : [] },
+    { t:"운동 시간 (분)", max:Math.max(...data.map(d=>d.run+d.str))*1.22,
+      total:v=>v.run+v.str, fmt:v=>Math.round(v),
+      segs:d=>[ d.run>0?{v:d.run,c:css('--s1'),n:"러닝",u:"분"}:null,
+                d.str>0?{v:d.str,c:css('--s3'),n:"근력",u:"분"}:null ].filter(Boolean) },
+  ];
+
+  let s=svgOpen(W,H,"최근 7일 일자별 운동량");
+  bands.forEach((b,bi)=>{
+    const top=pad.t+bi*bandH+16, ih=bandH-34;
+    const y=v=>top+ih-(v/b.max)*ih;
+    s+=`<text class="lbl" x="${pad.l}" y="${top-6}">${esc(b.t)}</text>`;
+    [0,b.max/2,b.max].forEach(v=>{ const yy=y(v);
+      s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+      s+=`<text class="axis" x="${pad.l-8}" y="${yy+4}" text-anchor="end">${Math.round(v)}</text>`;});
+    data.forEach((d,i)=>{
+      const cx=cxOf(i), bx=cx-bw/2, tot=b.total(d), segs=b.segs(d);
+      if(tot>0){
+        let acc=0;
+        segs.forEach(sg=>{
+          const yTop=y(acc+sg.v), hh=y(acc)-y(acc+sg.v)-(segs.length>1?2:0);
+          if(hh>0) s+=`<rect x="${bx}" y="${yTop}" width="${bw}" height="${hh}" rx="4" fill="${sg.c}"><title>${d.d}(${d.w}) ${sg.n} ${sg.n==="거리"?sg.v.toFixed(1):Math.round(sg.v)}${sg.u}</title></rect>`;
+          acc+=sg.v;});
+        s+=`<text class="val" x="${cx}" y="${y(tot)-6}" text-anchor="middle">${b.fmt(tot)}</text>`;
+      } else {
+        s+=`<rect x="${bx}" y="${top+ih-3}" width="${bw}" height="3" rx="1.5" fill="${css('--neutral')}"><title>${d.d}(${d.w}) 완전 휴식</title></rect>`;
+      }});
+    // 밴드 합계
+    const bandSum = data.reduce((a,d)=>a+b.total(d),0);
+    s+=`<text class="lbl" x="${W-pad.r+8}" y="${top+12}" fill="${css('--ink3')}">합계 ${b.fmt(bandSum)}</text>`;
+  });
+  // 공유 x축
+  data.forEach((d,i)=>{ const cx=cxOf(i);
+    s+=`<text class="axis" x="${cx}" y="${H-18}" text-anchor="middle">${d.w}</text>`;
+    s+=`<text class="axis" x="${cx}" y="${H-4}" text-anchor="middle">${d.d}</text>`;});
+  $("#l7-chart").innerHTML=s+"</svg>";
+  $("#l7-legend").innerHTML = legend([{c:css('--s1'),t:"러닝"},{c:css('--s3'),t:"근력"},{c:css('--neutral'),t:"완전 휴식"}]);
+
+  $("#l7-table").innerHTML = tbl(["날짜","요일","거리(km)","러닝(분)","근력(분)","합계(분)"],
+    data.map(d=>[d.d, d.w, d.km>0?d.km.toFixed(1):"—", d.run>0?d.run.toFixed(0):"—",
+                 d.str>0?d.str.toFixed(0):"—", (d.run+d.str)>0?Math.round(d.run+d.str):"휴식"])
+        .concat([["합계","", sumKm.toFixed(1), sumRun.toFixed(0), sumStr.toFixed(0), Math.round(sumRun+sumStr)]]));
+})();
+
+/* ── 7a. 월별 마일리지 ── */
+(function(){
+  const data=DATA.monthlyVolume, W=1000,H=250,pad={t:22,r:60,b:32,l:44};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const max=Math.max(...data.map(d=>d.km))*1.16, bw=iw/data.length*0.62;
+  const y=v=>pad.t+ih-(v/max)*ih;
+  let s=svgOpen(W,H,"월별 마일리지");
+  [0,max/2,max].forEach(v=>{const yy=y(v);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+    s+=`<text class="axis" x="${pad.l-6}" y="${yy+3}" text-anchor="end">${Math.round(v)}</text>`;});
+  const ay=y(DATA.monthlyAvg);
+  s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${ay}" y2="${ay}" stroke="${css('--s2')}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  s+=`<text class="lbl" x="${W-pad.r+6}" y="${ay+4}" fill="${css('--s2')}">평균 ${DATA.monthlyAvg}</text>`;
+  data.forEach((d,i)=>{
+    const cx=pad.l+iw*(i+0.5)/data.length, bx=cx-bw/2, by=y(d.km), bh=pad.t+ih-by;
+    const cur=i===data.length-1;
+    s+=`<rect x="${bx}" y="${by}" width="${bw}" height="${Math.max(bh,0)}" rx="4" fill="${css('--s1')}"${cur?' opacity="0.65"':''}><title>${d.m}: ${d.km.toFixed(1)}km · ${d.n}회</title></rect>`;
+    s+=`<text class="val" x="${cx}" y="${by-6}" text-anchor="middle">${Math.round(d.km)}</text>`;
+    s+=`<text class="axis" x="${cx}" y="${H-12}" text-anchor="middle">${d.m}</text>`;});
+  $("#month-chart").innerHTML=s+"</svg>";
+  $("#month-table").innerHTML = tbl(["월","거리(km)","횟수","평균 1회"],
+    data.map(d=>[d.m, d.km.toFixed(1), `${d.n}회`, `${(d.km/d.n).toFixed(1)}km`]));
+})();
+
+/* ── 7b. 일별 마일리지 ── */
+(function(){
+  const data=DATA.dailyVolume, W=1000,H=230,pad={t:22,r:60,b:34,l:38};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const runDays=data.filter(d=>d.km>0);
+  const avg=runDays.reduce((a,d)=>a+d.km,0)/runDays.length;
+  const max=Math.max(...data.map(d=>d.km))*1.16, bw=iw/data.length*0.66;
+  const y=v=>pad.t+ih-(v/max)*ih;
+  let s=svgOpen(W,H,"일별 마일리지");
+  [0,max/2,max].forEach(v=>{const yy=y(v);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+    s+=`<text class="axis" x="${pad.l-6}" y="${yy+3}" text-anchor="end">${Math.round(v)}</text>`;});
+  const ay=y(avg);
+  s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${ay}" y2="${ay}" stroke="${css('--s2')}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  s+=`<text class="lbl" x="${W-pad.r+6}" y="${ay+4}" fill="${css('--s2')}">평균 ${avg.toFixed(1)}</text>`;
+  data.forEach((d,i)=>{
+    const cx=pad.l+iw*(i+0.5)/data.length, bx=cx-bw/2;
+    if(d.km>0){
+      const by=y(d.km), bh=pad.t+ih-by;
+      s+=`<rect x="${bx}" y="${by}" width="${bw}" height="${Math.max(bh,0)}" rx="3" fill="${css('--s1')}"><title>${d.d}: ${d.km.toFixed(1)}km</title></rect>`;
+      if(d.km>=15) s+=`<text class="val" x="${cx}" y="${by-5}" text-anchor="middle">${d.km.toFixed(0)}</text>`;
+    } else {
+      s+=`<rect x="${bx}" y="${pad.t+ih-3}" width="${bw}" height="3" rx="1.5" fill="${css('--neutral')}"><title>${d.d}: 휴식</title></rect>`;
+    }
+    if(i%3===0||i===data.length-1) s+=`<text class="axis" x="${cx}" y="${H-14}" text-anchor="middle">${d.d}</text>`;});
+  $("#day-chart").innerHTML=s+"</svg>";
+  $("#day-table").innerHTML = tbl(["날짜","거리(km)"], data.map(d=>[d.d, d.km>0?d.km.toFixed(1):"휴식"]));
+})();
+
+/* ── 7c. 주간 볼륨 스택 ── */
+(function(){
+  const data=DATA.weeklyVolume, W=1000,H=240,pad={t:20,r:60,b:32,l:38};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const max=Math.max(...data.map(d=>d.e+d.q))*1.14, bw=iw/data.length*0.6;
+  const y=v=>pad.t+ih-(v/max)*ih;
+  let s=svgOpen(W,H,"주간 볼륨 이지/질");
+  [0,max/2,max].forEach(v=>{const yy=y(v);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+    s+=`<text class="axis" x="${pad.l-6}" y="${yy+3}" text-anchor="end">${Math.round(v)}</text>`;});
+  // 평균선 — 진행 중인 마지막 주는 제외
+  const done=data.slice(0,-1), avg=done.reduce((a,d)=>a+d.e+d.q,0)/done.length, ay=y(avg);
+  s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${ay}" y2="${ay}" stroke="${css('--s3')}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  s+=`<text class="lbl" x="${W-pad.r+6}" y="${ay+4}" fill="${css('--s3')}">평균 ${avg.toFixed(1)}</text>`;
+  data.forEach((d,i)=>{
+    const cx=pad.l+iw*(i+0.5)/data.length, bx=cx-bw/2, tot=d.e+d.q;
+    const cur=i===data.length-1;
+    const yE=y(d.e), hE=pad.t+ih-yE;
+    const yQ=y(tot), hQ=y(d.e)-y(tot)-2;   // 2px 간격
+    if(hE>0) s+=`<rect x="${bx}" y="${yE}" width="${bw}" height="${hE}" rx="4" fill="${css('--s1')}"${cur?' opacity="0.65"':''}><title>${d.w} 이지 ${d.e.toFixed(1)}km</title></rect>`;
+    if(hQ>0) s+=`<rect x="${bx}" y="${yQ}" width="${bw}" height="${hQ}" rx="4" fill="${css('--s2')}"${cur?' opacity="0.65"':''}><title>${d.w} 질 ${d.q.toFixed(1)}km</title></rect>`;
+    s+=`<text class="val" x="${cx}" y="${y(tot)-6}" text-anchor="middle">${tot.toFixed(0)}</text>`;
+    s+=`<text class="axis" x="${cx}" y="${H-10}" text-anchor="middle">${d.w}</text>`;});
+  $("#vol-chart").innerHTML=s+"</svg>";
+  $("#vol-legend").innerHTML = legend([{c:css('--s1'),t:"이지"},{c:css('--s2'),t:"질"}]);
+  $("#vol-table").innerHTML = tbl(["주","이지 km","질 km","합계","질 비중"],
+    data.map(d=>[d.w,d.e.toFixed(1),d.q.toFixed(1),(d.e+d.q).toFixed(1),`${Math.round(d.q/(d.e+d.q)*100)}%`]));
+})();
+
+/* ── 8. 심박 존 분포 (100% 가로 스택) ── */
+(function(){
+  const data=DATA.hrZones, W=460,H=120,pad={l:16,r:16,t:30};
+  const iw=W-pad.l-pad.r, tot=data.reduce((a,d)=>a+d.v,0);
+  const ramp=[css('--o1'),css('--o2'),css('--o3'),css('--o4'),css('--o5')];
+  let s=svgOpen(W,H,"심박 존 분포"), cx=pad.l;
+  data.forEach((d,i)=>{
+    const w=iw*d.v/tot, pct=d.v/tot*100;
+    s+=`<rect x="${cx}" y="${pad.t}" width="${Math.max(w-2,1)}" height="30" rx="4" fill="${ramp[i]}"><title>${esc(d.k)}: ${Math.round(d.v/60)}분 (${pct.toFixed(1)}%)</title></rect>`;
+    if(pct>7) s+=`<text class="val" x="${cx+w/2-1}" y="${pad.t+20}" text-anchor="middle" fill="${i>=3?'#0d0d0d':'#ffffff'}">${pct.toFixed(0)}%</text>`;
+    cx+=w;});
+  const easy=(data[0].v+data[1].v+data[2].v)/tot*100;
+  s+=`<text class="lbl" x="${pad.l}" y="20">Z1–Z3 ${easy.toFixed(0)}% · Z4–Z5 ${(100-easy).toFixed(0)}%  (80/20 목표)</text>`;
+  s+=`<text class="axis" x="${pad.l}" y="${pad.t+52}">총 ${Math.round(tot/3600)}시간 / 28일</text>`;
+  $("#zone-chart").innerHTML=s+"</svg>";
+  $("#zone-legend").innerHTML = legend(data.map((d,i)=>({c:ramp[i],t:d.k})));
+  $("#zone-table").innerHTML = tbl(["존","시간","비중"],
+    data.map(d=>[d.k, `${Math.round(d.v/60)}분`, `${(d.v/tot*100).toFixed(1)}%`]));
+})();
+
+/* ── 9. 회복 3종 (스몰 멀티플 — 축이 달라 분할) ── */
+(function(){
+  const data=DATA.recovery, W=1000, rowH=104, pad={l:56,r:120,t:16};
+  const series=[
+    {key:"readiness", t:"트레이닝 준비도", c:css('--s1'), min:0,  max:100, band:null, fmt:v=>v},
+    {key:"hrv",       t:"HRV (ms)",       c:css('--s3'), min:35, max:85,  band:[DATA.hrvBand.low,DATA.hrvBand.high], fmt:v=>v},
+    {key:"rhr",       t:"안정시 심박 (bpm)", c:css('--s2'), min:38, max:52, band:null, fmt:v=>v},
+  ];
+  const H=pad.t+series.length*rowH+22, iw=W-pad.l-pad.r;
+  let s=svgOpen(W,H,"회복 지표 3종");
+  series.forEach((se,si)=>{
+    const top=pad.t+si*rowH, ih=rowH-40;
+    const x=i=>pad.l+iw*i/(data.length-1||1), y=v=>top+ih-((v-se.min)/(se.max-se.min))*ih;
+    s+=`<text class="lbl" x="${pad.l}" y="${top-2}" fill="${se.c}">${esc(se.t)}</text>`;
+    if(se.band){ s+=`<rect x="${pad.l}" y="${y(se.band[1])}" width="${iw}" height="${y(se.band[0])-y(se.band[1])}" fill="${css('--s3')}" opacity="0.13"/>`;
+      s+=`<text class="axis" x="${W-pad.r+6}" y="${y(se.band[1])+10}">기준 ${se.band[0]}–${se.band[1]}</text>`; }
+    [se.min,se.max].forEach(v=>{ s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${css('--grid')}"/>`;
+      s+=`<text class="axis" x="${pad.l-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`; });
+    s+=`<polyline points="${data.map((d,i)=>`${x(i)},${y(d[se.key])}`).join(" ")}" fill="none" stroke="${se.c}" stroke-width="2" stroke-linejoin="round"/>`;
+    data.forEach((d,i)=>{ s+=`<circle cx="${x(i)}" cy="${y(d[se.key])}" r="4" fill="${se.c}" stroke="${css('--card')}" stroke-width="2"><title>${d.d} ${se.t}: ${d[se.key]}</title></circle>`; });
+    const last=data.at(-1);
+    s+=`<text class="val" x="${W-pad.r+6}" y="${y(last[se.key])+4}" fill="${se.c}">${last[se.key]}</text>`;
+    if(si===series.length-1) data.forEach((d,i)=>{ s+=`<text class="axis" x="${x(i)}" y="${top+ih+22}" text-anchor="middle">${d.d}</text>`; });
+  });
+  $("#rec-chart").innerHTML=s+"</svg>";
+})();
+
+/* ── 10. 수면 스택 + 취침 시각 ── */
+(function(){
+  const data=DATA.sleep, W=1000,H=280,pad={t:22,r:56,b:52,l:44};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const max=Math.max(...data.map(d=>d.deep+d.light+d.rem+d.awake))*1.12;
+  const bw=iw/data.length*0.56, y=v=>pad.t+ih-(v/max)*ih;
+  const segs=[{k:"deep",t:"깊은수면",c:css('--o4')},{k:"rem",t:"REM",c:css('--o3')},
+              {k:"light",t:"얕은수면",c:css('--o2')},{k:"awake",t:"각성",c:css('--neutral')}];
+  let s=svgOpen(W,H,"수면 구성");
+  for(let hr=0;hr<=9;hr+=3){ const yy=y(hr*3600);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+    s+=`<text class="axis" x="${pad.l-6}" y="${yy+3}" text-anchor="end">${hr}h</text>`; }
+  const y7=y(7*3600);
+  s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y7}" y2="${y7}" stroke="${css('--warn')}" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  s+=`<text class="lbl" x="${W-pad.r+5}" y="${y7+4}" fill="${css('--warn')}">7시간</text>`;
+  data.forEach((d,i)=>{
+    const cx=pad.l+iw*(i+0.5)/data.length, bx=cx-bw/2;
+    let acc=0;
+    segs.forEach(sg=>{ const v=d[sg.k]; if(!v) return;
+      const yTop=y(acc+v), hh=y(acc)-y(acc+v)-2;
+      if(hh>0) s+=`<rect x="${bx}" y="${yTop}" width="${bw}" height="${hh}" rx="3" fill="${sg.c}"><title>${d.d} ${sg.t}: ${Math.round(v/60)}분</title></rect>`;
+      acc+=v; });
+    s+=`<text class="val" x="${cx}" y="${y(acc)-6}" text-anchor="middle">${hm(acc)}</text>`;
+    s+=`<text class="axis" x="${cx}" y="${H-32}" text-anchor="middle">${d.d}</text>`;
+    // 취침 시각 (분 오프셋: 음수=자정 이전)
+    const hh2 = d.bed<0 ? 24+Math.floor(d.bed/60) : Math.floor(d.bed/60);
+    const mm2 = ((d.bed%60)+60)%60;
+    const late = d.bed > -30;
+    s+=`<circle cx="${cx}" cy="${H-16}" r="5" fill="${late?css('--crit'):css('--s3')}"><title>${d.d} 취침 ${String(hh2).padStart(2,"0")}:${String(mm2).padStart(2,"0")}</title></circle>`;
+    s+=`<text class="axis" x="${cx}" y="${H-2}" text-anchor="middle" fill="${late?css('--crit'):css('--ink3')}">${String(hh2).padStart(2,"0")}:${String(mm2).padStart(2,"0")}</text>`;});
+  $("#sleep-chart").innerHTML=s+"</svg>";
+  $("#sleep-legend").innerHTML = legend(segs.map(sg=>({c:sg.c,t:sg.t})).concat([{c:css('--crit'),t:"취침 23:30 이후"}]));
+  $("#sleep-table").innerHTML = tbl(["날짜","점수","총","깊은","REM","각성"],
+    data.map(d=>[d.d, d.score, hm(d.deep+d.light+d.rem+d.awake), `${Math.round(d.deep/60)}분`, `${Math.round(d.rem/60)}분`, `${Math.round(d.awake/60)}분`]));
+})();
+
+/* ── 11. 근력 세트 (그룹 막대 + 목표선) ── */
+(function(){
+  const data=DATA.strengthWeeks, tg=DATA.strengthTarget;
+  const W=460,H=220,pad={t:20,r:12,b:30,l:30};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const max=Math.max(...data.flatMap(d=>[d.u,d.l,d.c]), tg.u, tg.l, tg.c)*1.25;
+  const y=v=>pad.t+ih-(v/max)*ih;
+  const groups=[{k:"u",t:"상체",c:css('--s1'),g:tg.u},{k:"l",t:"하체",c:css('--s2'),g:tg.l},{k:"c",t:"코어",c:css('--s3'),g:tg.c}];
+  const gw=iw/data.length, bw=(gw*0.72)/3;
+  let s=svgOpen(W,H,"주간 근력 세트");
+  [0,max/2,max].forEach(v=>{const yy=y(v);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${css('--grid')}"/>`;
+    s+=`<text class="axis" x="${pad.l-6}" y="${yy+3}" text-anchor="end">${Math.round(v)}</text>`;});
+  groups.forEach(g=>{ const yy=y(g.g);
+    s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${yy}" y2="${yy}" stroke="${g.c}" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.75"/>`;});
+  data.forEach((d,i)=>{
+    const gx=pad.l+gw*i+gw*0.14;
+    groups.forEach((g,j)=>{ const v=d[g.k], bx=gx+j*bw, hh=pad.t+ih-y(v);
+      if(hh>0) s+=`<rect x="${bx+1}" y="${y(v)}" width="${bw-2}" height="${hh}" rx="3" fill="${g.c}"><title>${d.w} ${g.t}: ${v}세트 (목표 ${g.g})</title></rect>`;
+      else s+=`<rect x="${bx+1}" y="${pad.t+ih-2}" width="${bw-2}" height="2" fill="${g.c}" opacity="0.4"><title>${d.w} ${g.t}: 0세트 (목표 ${g.g})</title></rect>`;});
+    s+=`<text class="axis" x="${gx+bw*1.5}" y="${H-10}" text-anchor="middle">${d.w}</text>`;});
+  $("#str-chart").innerHTML=s+"</svg>";
+  $("#str-legend").innerHTML = legend(groups.map(g=>({c:g.c,t:`${g.t} (목표 ${g.g})`})));
+  $("#str-table").innerHTML = tbl(["주","상체","하체","코어"], data.map(d=>[d.w,d.u,d.l,d.c]));
+})();
+
+/* ── 근력 플랜 표 ── */
+$("#strplan tbody").innerHTML = DATA.strengthPlan.map(p=>`
+  <tr><td style="color:var(--ink3);white-space:nowrap">${esc(p.g)}</td><td>${esc(p.n)}</td><td class="num">${esc(p.s)}</td></tr>`).join("");
+
+/* ── 주간 플랜 / 활동 표 ── */
+const weekRows = plan => plan.map(w=>`
+  <tr><td style="color:var(--ink2);width:44px">${esc(w.d)}</td>
+  <td style="${w.done?'color:var(--ink3);text-decoration:line-through':''}">${w.done?'✓ ':''}${esc(w.s)}</td></tr>`).join("");
+$("#week tbody").innerHTML = weekRows(DATA.weekPlan);
+$("#week-next tbody").innerHTML = weekRows(DATA.weekPlanNext || []);
+$("#acts tbody").innerHTML = DATA.recentActivities.map(a=>`
+  <tr><td>${esc(a.date)}</td><td>${esc(a.type)}</td><td class="num">${esc(a.dist)}</td>
+  <td class="num">${esc(a.pace)}</td><td class="num">${esc(a.hr)}</td></tr>`).join("");
+
+/* 모바일: 가로 스크롤이 필요한 차트에만 스와이프 안내를 붙인다 */
+document.querySelectorAll(".scroll").forEach(el=>{
+  if(!el.querySelector("svg.wide")) return;
+  const hint=document.createElement("div");
+  hint.className="swipe"; hint.textContent="← 좌우로 밀어서 전체 보기 →";
+  el.insertAdjacentElement("afterend", hint);
+});
+
+$("#note").innerHTML = DATA.isSample
+  ? "⚠️ <b>SAMPLE 데이터입니다.</b> <code>/dashboard</code>를 실행하면 실제 Garmin 데이터로 재생성됩니다."
+  : "실제 Garmin 데이터 기반. 갱신하려면 <code>/dashboard</code>를 다시 실행하세요. 막대·점에 마우스를 올리면 상세값이 나옵니다.";
+</script>
+</body>
+</html>
