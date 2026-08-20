@@ -100,6 +100,17 @@
   summary{cursor:pointer;font-size:12px;color:var(--ink3)}
   details table{margin-top:8px}
 
+  /* 코치 코멘트 */
+  .verdict{font-size:16px;font-weight:700;line-height:1.55;margin:0 0 4px;color:var(--ink)}
+  .cn{display:flex;gap:10px;padding:12px 0;border-top:1px solid #1e262c}
+  .cn>i{flex:none;width:9px;height:9px;border-radius:50%;margin-top:6px}
+  .cn b{display:block;font-size:13.5px;margin-bottom:4px;color:var(--ink)}
+  .cn p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.6}
+  .cn-next{margin-top:16px;padding:12px 14px;border-radius:10px;background:#131a1e;
+    border:1px solid var(--line);font-size:12.5px;color:var(--ink2);line-height:1.65}
+  .cn-next b{color:var(--ink);display:block;margin-bottom:5px;font-size:12px;
+    letter-spacing:.4px;text-transform:uppercase}
+
   .note{margin-top:26px;padding:12px 16px;border:1px dashed #3a4a52;border-radius:10px;
     color:var(--ink2);font-size:12.5px;background:#131a1e}
   .axis{font-size:11px;fill:var(--ink3)}
@@ -328,6 +339,18 @@
     </div>
   </section>
 
+  <section class="sec">
+    <h2>코치 코멘트</h2>
+    <div class="grid one">
+      <div class="panel">
+        <p class="cap" id="cn-stamp"></p>
+        <p class="verdict" id="cn-verdict"></p>
+        <div id="cn-items"></div>
+        <div class="cn-next" id="cn-next"></div>
+      </div>
+    </div>
+  </section>
+
   <div class="note" id="note"></div>
 </div>
 
@@ -534,6 +557,23 @@ const DATA = {
     {date:"08-17",type:"거리주 (유산소TE 4.6 · 최장)",dist:"28.2 km",pace:"5:30",hr:133},
     {date:"08-16",type:"이지런",dist:"9.0 km",pace:"5:22",hr:135},
   ],
+
+  // 코치 코멘트 — t: good|warn|serious|crit (좌측 점 색)
+  coachNote: {
+    updated: "2026-08-20",
+    verdict: "무산소 부족은 하루 만에 풀렸다. 대신 회복이 관측 이래 최저로 떨어졌다 — 오늘은 완전 휴식.",
+    items: [
+      { t:"good", h:"인터벌이 정확히 통했다",
+        b:"8/19 트랙 5.01km @4:14(무산소TE 2.7)로 무산소 로드가 195 → 291, 하한 279를 넘겨 ANAEROBIC_SHORTAGE가 하루 만에 해소됐다. 4:14는 역치 4:25보다 11초 빠른 진짜 VO2 자극이다. 트레이닝 상태도 PRODUCTIVE로 올라섰고 예측은 7일 연속 개선 중." },
+      { t:"crit", h:"회복 지표 3종이 처음으로 동시에 무너졌다",
+        b:"준비도 8 POOR, 회복시간 85.2시간(3.5일)으로 이 플랜에서 처음 보는 수치다. 안정시 심박 50은 기준선 44 대비 +6으로 관측 최고, HRV 42는 기준 하단 48 아래, REM은 25분까지 떨어졌다. 이전 인터벌 때는 HRV가 버텨줬는데 이번엔 셋이 같이 눌렸다." },
+      { t:"warn", h:"토요일 거리주와 회복 클럭이 정면 충돌",
+        b:"회복시간이 토요일 아침까지 돈다. 계획된 24km + 후반 8km @MP를 그대로 가면 무리다. 금요일 아침 준비도로 거리와 MP 구간을 다시 판정해야 한다." },
+      { t:"warn", h:"하체·코어는 여전히 0세트",
+        b:"W34 근력 3세트가 전부 상체(풀업·슈러그)다. 빌드 단계는 하체가 핵심인데 A데이(수요일 하체)가 도입 이후 한 번도 실행되지 않았다. 플랭크·사이드플랭크·데드버그는 합쳐서 5분이다." },
+    ],
+    next: "오늘(목): 러닝 0km · 근력 추가 금지 · 23:00 취침. 금: 완전 휴식 유지, 근력도 금지. 토: 아침 준비도로 확정 — 50 이상이면 24km(후반 6km @MP), 35~49면 20km 순수 이지, 35 미만이면 14km 리커버리.",
+  },
 };
 
 /* ══════════════════════════ 렌더 ══════════════════════════ */
@@ -1003,6 +1043,16 @@ document.querySelectorAll(".scroll").forEach(el=>{
   hint.className="swipe"; hint.textContent="← 좌우로 밀어서 전체 보기 →";
   el.insertAdjacentElement("afterend", hint);
 });
+
+/* ── 코치 코멘트 ── */
+(function(){
+  const c = DATA.coachNote; if(!c) return;
+  $("#cn-stamp").textContent = `${c.updated} 기준 · Garmin 실측을 PLAN.md와 대조한 평가`;
+  $("#cn-verdict").textContent = c.verdict;
+  $("#cn-items").innerHTML = c.items.map(i=>
+    `<div class="cn"><i style="background:var(--${i.t})"></i><div><b>${esc(i.h)}</b><p>${esc(i.b)}</p></div></div>`).join("");
+  $("#cn-next").innerHTML = `<b>다음 행동</b>${esc(c.next)}`;
+})();
 
 $("#note").innerHTML = DATA.isSample
   ? "⚠️ <b>SAMPLE 데이터입니다.</b> <code>/dashboard</code>를 실행하면 실제 Garmin 데이터로 재생성됩니다."
