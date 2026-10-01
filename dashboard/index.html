@@ -312,20 +312,6 @@
   </section>
 
   <section class="sec">
-    <h2>러닝 플랜</h2>
-    <div class="grid">
-      <div class="panel">
-        <h3>이번 주 <span style="color:var(--ink3);font-weight:500;font-size:12px" id="week-phase"></span></h3>
-        <table id="week"><thead><tr><th>요일</th><th>세션</th></tr></thead><tbody></tbody></table>
-      </div>
-      <div class="panel">
-        <h3>다음 주 <span style="color:var(--ink3);font-weight:500;font-size:12px" id="week-phase-next"></span></h3>
-        <table id="week-next"><thead><tr><th>요일</th><th>세션</th></tr></thead><tbody></tbody></table>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec">
     <h2>최근 활동</h2>
     <div class="grid one">
       <div class="panel">
@@ -519,27 +505,6 @@ const DATA = {
   strengthTarget: {u:6, l:6, c:4},
   strengthStart: "완료된 4주(W36–W39) 합계가 상체 20 / 하체 4 / 코어 1이다(주간 목표 6 / 6 / 4). 코어 1세트는 9/06 이후 25일째 그대로다. 진행 중인 W40은 9/28 27분 + 9/29 12분 + 9/30 28분으로 67분이 들어갔는데 Garmin이 잡은 종목은 상체 3세트와 분류 불가 4건이다 — 시간은 쓰는데 하체·코어로 안 간다. 레이스까지 31일이니 이제 근비대는 의미가 없고, 남은 역할은 후반 페이스를 지탱할 둔근·코어 유지뿐이다. 10/4 롱런의 후반 14km를 4:27로 버티는 건 결국 이 둘이 하는 일인데 5주째 비어 있다. 기구 없이 러닝 직후 10분이면 끝나는 플랭크·사이드 플랭크·데드버그를 토요일부터 매일 붙인다",
 
-  weekLabel: "피크 W11 · 9/28–10/4 (피크 2일차 · 목표 ~80km · 현재 40.4km)",
-  weekPlan: [
-    {d:"월",s:"이지 10.19km @5:49 HR123 실행 ✅ + 근력 27분",done:true},
-    {d:"화",s:"아침 8.01km @5:06 HR145 + 정리조깅 3.16km 실행 ✅ 근력 12분. 처방한 저녁 클럽 인터벌은 하루 밀려 수요일에 들어갔다",done:true},
-    {d:"수",s:"⚑ 트랙 인터벌 실행 ✅ 본 구간 9.02km @4:18 HR156(유산소TE 4.1, 무산소TE 0.8, 부하 215) + 아침 트레드밀 5.38km + 워밍업·정리 = 하루 19.0km, 근력 28분. 9/18 이후 13일 만의 질 훈련이고 무산소 로드를 165 → 195로 되돌렸다",done:true},
-    {d:"목",s:"처방했던 역치 4×2000m는 전면 취소한다. 준비도 1 POOR·수면 42점(각성 83분, REM 0분)·HRV 40(밴드 52–76 아래)으로 세 지표가 동시에 바닥이다. 오늘은 완전 휴식 — 러닝도 근력도 하지 않는다"},
-    {d:"금",s:"준비도 30 이상이면 이지 6~8km @6:30 이하, 30 미만이면 하루 더 완전 휴식. 어느 쪽이든 강도는 금지다"},
-    {d:"토",s:"이지 8km @6:15 + 스트라이드 4×100m로 다리만 깨운다 · 코어 세트 시작"},
-    {d:"일",s:"⚑ 롱런 30km, 후반 14km @MP 4:27 + 뉴트리션 리허설(물 500ml + 젤 2개). 시즌 첫 MP 리허설이다. 목·금 이틀을 비우는 건 전부 이 하루를 위해서다"},
-  ],
-  weekNextLabel: "피크 W12 · 10/5–10/11 (피크 핵심 주 · 목표 ~85km)",
-  weekPlanNext: [
-    {d:"월",s:"리커버리 8km @6:15 + 코어 세트"},
-    {d:"화",s:"이지 10km + 스트라이드 6×100m · 근력 A(하체: 스쿼트·런지·힙 스러스트)"},
-    {d:"수",s:"⚑ 트랙 인터벌 6×800m @3:50 R2min — 9/30처럼 수요일에 고정한다. 화요일 처방이 2주 연속 수요일로 밀렸으니 요일을 현실에 맞춘다"},
-    {d:"목",s:"리커버리 8km @6:30 이하 · 근력 B(상체·코어)"},
-    {d:"금",s:"완전 휴식 — 근력 금지"},
-    {d:"토",s:"이지 8km @6:15 + 스트라이드 4×100m"},
-    {d:"일",s:"⚑ 롱런 32km, 후반 16–18km @MP 4:27. 레이스 3주 전 최종 리허설이고, 여기서 MP가 성립하면 테이퍼는 줄이기만 하면 된다"},
-  ],
-
   recentActivities: [
     {date:"10-01",type:"완전 휴식 · 준비도 1 POOR · 수면 42점(각성 83분, REM 0분) · HRV 40",dist:"0 km",pace:"—",hr:"—"},
     {date:"09-30",type:"⚑ 트랙 인터벌 본 구간 9.02km @4:18 HR156 · 유산소TE 4.1 · 부하 215 · 13일 만의 질 훈련 + 근력 28분",dist:"19.0 km",pace:"5:35",hr:137},
@@ -594,8 +559,6 @@ $("#goal-time").textContent = DATA.goal.time;
 $("#goal-pace").textContent = DATA.goal.pace;
 $("#stamp").textContent = `업데이트 ${DATA.generatedAt}` + (DATA.isSample ? " · SAMPLE 데이터" : "");
 $("#vo2-range").textContent = `${DATA.vo2maxTrend[0].d} – ${DATA.vo2maxTrend.at(-1).d}`;
-$("#week-phase").textContent = DATA.weekLabel;
-$("#week-phase-next").textContent = DATA.weekNextLabel;
 $("#str-start").textContent = DATA.strengthStart;
 $("#thr-cap").textContent =
   `LTHR ${DATA.threshold.ltHr} · 통상 MP는 역치보다 ${DATA.threshold.typicalGapMin}~${DATA.threshold.typicalGapMax}초 느리다`;
@@ -1020,12 +983,7 @@ $("#mil-tiles").innerHTML = DATA.mileageStats.map(m=>`
   $("#str-table").innerHTML = tbl(["주","상체","하체","코어"], data.map(d=>[d.w,d.u,d.l,d.c]));
 })();
 
-/* ── 주간 플랜 / 활동 표 ── */
-const weekRows = plan => plan.map(w=>`
-  <tr><td style="color:var(--ink2);width:44px">${esc(w.d)}</td>
-  <td style="${w.done?'color:var(--ink3);text-decoration:line-through':''}">${w.done?'✓ ':''}${esc(w.s)}</td></tr>`).join("");
-$("#week tbody").innerHTML = weekRows(DATA.weekPlan);
-$("#week-next tbody").innerHTML = weekRows(DATA.weekPlanNext || []);
+/* ── 활동 표 ── */
 $("#acts tbody").innerHTML = DATA.recentActivities.map(a=>`
   <tr><td>${esc(a.date)}</td><td>${esc(a.type)}</td><td class="num">${esc(a.dist)}</td>
   <td class="num">${esc(a.pace)}</td><td class="num">${esc(a.hr)}</td></tr>`).join("");
