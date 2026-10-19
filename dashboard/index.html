@@ -183,6 +183,13 @@
   .cn-next b{color:var(--p3);display:block;margin-bottom:5px;font-size:11.5px;
     letter-spacing:.12em;text-transform:uppercase}
   .cn-next b::before{content:"❯ "}
+  .rf-h{margin:16px 0 6px;font-size:11.5px;color:var(--p3);letter-spacing:.12em;text-transform:uppercase}
+  .rf-h:first-child{margin-top:0}
+  .rf-odds{display:grid;grid-template-columns:minmax(92px,auto) 1fr 44px;gap:8px 10px;align-items:center;font-size:12.5px}
+  .rf-odds .bar{height:12px;border-radius:3px;background:var(--grid);overflow:hidden}
+  .rf-odds .bar i{display:block;height:100%;background:var(--o3)}
+  .rf-odds .pct{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+  .rf-sub{margin:4px 0 0;font-size:11.5px;color:var(--ink3)}
 
   .note{margin-top:26px;padding:12px 16px;border:1px dashed #2a3a32;border-radius:8px;
     color:var(--ink2);font-size:12px;background:var(--crt)}
@@ -247,7 +254,7 @@
     <span class="brand"><b>jihwan</b>-marathon.sh<span class="cur" aria-hidden="true"></span></span>
     <nav class="nav" aria-label="섹션 이동">
       <a href="#perf">퍼포먼스</a><a href="#load">로드</a><a href="#mileage">마일리지</a>
-      <a href="#recovery">회복</a><a href="#strength">근력</a><a href="#acts-sec">활동</a><a href="#coach">코치</a>
+      <a href="#recovery">회복</a><a href="#strength">근력</a><a href="#acts-sec">활동</a><a href="#coach">코치</a><a href="#race">대회</a>
     </nav>
   </header>
 
@@ -432,6 +439,32 @@
         <p class="verdict" id="cn-verdict"></p>
         <div id="cn-items"></div>
         <div class="cn-next" id="cn-next"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="race">
+    <h2>11/1 대회 예상<span class="n">08 / RACE</span></h2>
+    <div class="grid">
+      <div class="panel">
+        <p class="cap" id="rf-stamp"></p>
+        <p class="verdict" id="rf-verdict"></p>
+        <h3 class="rf-h">레이스 페이스 플랜</h3>
+        <table id="rf-pace"><thead><tr><th>구간</th><th class="num">페이스</th><th>기준</th></tr></thead><tbody></tbody></table>
+        <p class="rf-sub" id="rf-watch"></p>
+      </div>
+      <div class="panel">
+        <h3 class="rf-h">결과별 가능성 (코치 추정)</h3>
+        <div class="rf-odds" id="rf-odds"></div>
+        <p class="rf-sub" id="rf-odds-note"></p>
+        <h3 class="rf-h">근거 — 최근 기록의 풀코스 환산</h3>
+        <table id="rf-basis"><thead><tr><th>근거</th><th class="num">환산</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:14px">
+      <div class="panel">
+        <div id="rf-items"></div>
+        <div class="cn-next" id="rf-next"></div>
       </div>
     </div>
   </section>
@@ -638,6 +671,41 @@ const DATA = {
     ],
     next: "오늘(월 10/19): 근력 11분으로 끝. 러닝 없음. 화(10/20): 클럽 인터벌은 평소 개수의 절반만, 1km 반복이면 4~5개 @4:10~4:15, 회복 조깅 충분히. 수(10/21): 이지 8km @5:30 이하, HR 142 이하. 목(10/22): 이지 8km + 100m 스트라이드 4개, 끝나고 힙 레이즈·플랭크 10분. 금(10/23): 완전 휴식 — 이번엔 정말 쉰다. 토(10/24) — 마지막 리허설: 18km, 앞 6km 5:30, 이어서 10km @4:30, 마지막 2km 쿨다운. 레이스 신발·젤·아침 식사를 레이스 당일과 똑같이 맞춘다. 판정: 10km를 4:28~4:32로 지키고 마지막 2km 심박 155 이하 → 3:10, 레이스 초반 4:30 이븐. 4:35보다 느려지거나 심박 158 이상 → 3:13 목표, 초반 4:35로 출발. 일(10/25): 이지 6km. W43 합계 약 48km가 상한이다.",
   },
+  // 11/1 대회 예상 — 레이스 페이스 결정과 결과 확률(코치 추정). 리허설(10/24) 뒤 갱신
+  raceForecast: {
+    updated: "2026-10-19",
+    verdict: "레이스 페이스는 4:30/km, 목표 3:10. 싱글(서브3)은 2% 안팎이라 이번 대회의 목표로 두지 않는다. 4:30만 지켜도 PR(3:17:51) 경신 가능성은 75% 안팎이다.",
+    pacePlan: [
+      {seg:"0–5km",  pace:"4:33–4:35", note:"일부러 늦게 출발한다. 혼잡 구간에서 아끼는 10초가 35km에서 1분이 된다"},
+      {seg:"5–30km", pace:"4:29–4:30", note:"심박 155가 상한. 넘으면 페이스를 늦춘다"},
+      {seg:"30km–",  pace:"느낌대로", note:"남은 힘이 있으면 4:25까지 올린다"},
+    ],
+    watchNote: "시계는 4:27~4:28을 본다. 실제 코스에서는 GPS 거리가 0.3~0.5km 더 나와서, 시계 4:30에 맞추면 실제 기록이 3:12 안팎이 된다.",
+    odds: [
+      {k:"싱글 (3:00 미만)", p:2},
+      {k:"3:10 미만",        p:30},
+      {k:"3:10–3:15",        p:45},
+      {k:"3:15 이상",        p:25},
+    ],
+    oddsNote: "모형 계산이 아니라 아래 근거를 종합한 코치 판단이다. 3:17:51보다 빠르면 PR이다.",
+    basis: [
+      {k:"10/17 10km 42:58 (리겔 공식)",            v:"약 3:17"},
+      {k:"같은 기록의 VDOT 약 50 (다니엘스)",        v:"약 3:11"},
+      {k:"그 10km가 전력의 90~95%였다고 보정",       v:"3:06–3:09"},
+      {k:"Garmin 마라톤 예측 (10/19)",               v:"3:18:29"},
+      {k:"하프 PR 1:35:17 · 풀 PR 3:17:51",          v:"3:15–3:18"},
+    ],
+    items: [
+      { t:"crit", h:"싱글이 어려운 이유 — 4:16/km를 42km 동안",
+        b:"싱글은 42.195km를 4:16/km로 가야 한다. 10/17에 10km를 4:17로 이븐하게 달렸으니, 거의 그 속도를 4배 넘는 거리 동안 지켜야 한다는 뜻이다. 가장 낙관적인 환산도 3:06이고, 싱글이 현실적이려면 10km를 39분 안팎에 달려야 한다. 더 큰 문제는 후반이다. 10/05 32km에서 마지막 10km가 평균 4:59까지 떨어졌다. 4:16으로 출발하면 25~30km에서 무너질 가능성이 크고, 그러면 결과는 3:20을 넘긴다. 싱글을 노리다 PR까지 놓치는 그림이다." },
+      { t:"good", h:"4:30은 이제 버틸 수 있는 속도다",
+        b:"10/17 10km 4:17은 3:10 페이스(4:30)보다 13초 빠르다. 10/10에 15.05km를 4:28(후반 10km 4:23)로, 10/14에 5.06km를 4:26(심박 148~154)으로 달렸다. 속도는 3:10에 충분하다. 남은 변수는 30km 이후에도 4:30을 지키는 후반 지구력 하나다." },
+      { t:"warn", h:"다음 시즌 목표로 싱글을 둔다",
+        b:"이번 대회에서 PR을 확실히 챙기고, 싱글은 다음 시즌 목표로 둔다. 장거리 후반에 MP를 지키는 훈련(30km 이상 장거리의 마지막 10~15km를 MP로)을 한 시즌 더 쌓으면 현실적인 목표가 된다." },
+    ],
+    decision: "10/24(토) 18km 리허설(앞 6km 5:30 → 10km @4:30 → 2km 쿨다운)로 확정한다. 10km를 4:28~4:32로 지키고 마지막 2km 심박이 155 이하면 3:10, 출발부터 4:30 이븐. 4:35보다 느려지거나 심박이 158 이상이면 목표를 3:13으로 잡고 4:35로 출발한다.",
+  },
+
 
 
 };
@@ -1130,6 +1198,24 @@ document.querySelectorAll(".scroll").forEach(el=>{
   $("#cn-items").innerHTML = c.items.map(i=>
     `<div class="cn"><i style="background:var(--${i.t})"></i><div><b>${esc(i.h)}</b><p>${esc(i.b)}</p></div></div>`).join("");
   $("#cn-next").innerHTML = `<b>다음 행동</b>${esc(c.next)}`;
+})();
+
+/* ── 11/1 대회 예상 ── */
+(function(){
+  const r = DATA.raceForecast; if(!r){ $("#race").remove(); document.querySelector('a[href="#race"]')?.remove(); return; }
+  $("#rf-stamp").textContent = `${r.updated} 기준 · 목표 ${DATA.goal.time} · 레이스 ${DATA.raceDate} (D-${DATA.dDay})`;
+  $("#rf-verdict").textContent = r.verdict;
+  $("#rf-pace tbody").innerHTML = r.pacePlan.map(x=>
+    `<tr><td style="white-space:nowrap">${esc(x.seg)}</td><td class="num" style="white-space:nowrap">${esc(x.pace)}</td><td style="color:var(--ink2)">${esc(x.note)}</td></tr>`).join("");
+  $("#rf-watch").textContent = r.watchNote||"";
+  $("#rf-odds").innerHTML = r.odds.map(o=>
+    `<span>${esc(o.k)}</span><span class="bar"><i style="width:${Math.max(1,o.p)}%"></i></span><span class="pct">${o.p<5?"~":""}${o.p}%</span>`).join("");
+  $("#rf-odds-note").textContent = r.oddsNote||"";
+  $("#rf-basis tbody").innerHTML = r.basis.map(b=>
+    `<tr><td>${esc(b.k)}</td><td class="num">${esc(b.v)}</td></tr>`).join("");
+  $("#rf-items").innerHTML = r.items.map(i=>
+    `<div class="cn"><i style="background:var(--${i.t})"></i><div><b>${esc(i.h)}</b><p>${esc(i.b)}</p></div></div>`).join("");
+  $("#rf-next").innerHTML = `<b>판정 기준</b>${esc(r.decision)}`;
 })();
 
 /* ── 파생 캡션 (DATA에서 계산 — 하드코딩 금지) ── */
