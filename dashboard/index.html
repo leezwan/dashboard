@@ -7,12 +7,12 @@
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="description" id="meta-desc" content="2027-11-07 풀코스 sub 3:00 대시보드 · Garmin 실측">
+<meta name="description" id="meta-desc" content="2027-11-07 풀코스 sub 3:09 대시보드 · Garmin 실측">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23060a09'/><text x='14' y='68' font-family='monospace' font-weight='700' font-size='56' fill='%2341ff8b'>❯_</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
-<title>지환 Dashboard · 3:00 sub · D-day</title>
+<title>지환 Dashboard · 3:09 sub · D-day</title>
 <style>
   /* ── 터미널(CRT) 컨셉 ─────────────────────────────────────────
      UI 크롬은 인광 그린 --p1 / 앰버 --p3. 둘 다 데이터 색이 아니다.
@@ -156,6 +156,11 @@
   .legend span{display:inline-flex;align-items:center;gap:6px}
   .legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
 
+  #tp td:first-child{white-space:nowrap;color:var(--ink)}
+  #tp td.num{white-space:nowrap}
+  #tp td:last-child{color:var(--ink2);line-height:1.5}
+  .tpwrap{overflow-x:auto;max-width:100%}
+  @media(max-width:600px){#tp td:last-child{font-size:11.5px;min-width:150px}#tp td,#tp th{padding:6px 4px}#tp td:first-child,#tp td.num{white-space:normal}}
   table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
   th{color:var(--ink3);font-weight:500;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em}
   td{padding:8px;border-bottom:1px solid #15201b;color:var(--ink)}
@@ -260,7 +265,7 @@
 
   <section class="hero">
     <span class="kicker">Garmin 실측 · <span id="race-sub"></span></span>
-    <h1>풀코스 <span class="accent" id="h1-goal">Sub 3:00</span>, 갈 수 있나?</h1>
+    <h1>풀코스 <span class="accent" id="h1-goal">Sub 3:09</span>, 갈 수 있나?</h1>
     <p class="tagline">Garmin Connect 실측을 100일 플랜과 대조한 레이스 준비 상태</p>
     <div class="hero-stats" id="hero-stats"></div>
 
@@ -271,7 +276,7 @@
         <span class="term-meta" id="stamp"></span>
       </div>
       <div class="term-screen">
-        <div class="term-line"><span class="ps1">❯</span> <span class="cmd" id="term-goal">race --countdown --goal sub-3:00</span></div>
+        <div class="term-line"><span class="ps1">❯</span> <span class="cmd" id="term-goal">race --countdown --goal sub-3:09</span></div>
         <div class="hero-top">
           <div class="dday" id="dday"></div>
           <div class="meta">
@@ -312,7 +317,7 @@
       </div>
       <div class="panel">
         <h3>기록별 페이스 vs 목표 MP</h3>
-        <p class="cap">개인 최고기록 환산 페이스 · 점선 = 목표 MP 4:27</p>
+        <p class="cap" id="pr-cap">개인 최고기록 환산 페이스 · 점선 = 목표 MP</p>
         <div class="scroll" id="pr-chart"></div>
       </div>
     </div>
@@ -321,6 +326,14 @@
         <h3>역치 대비 목표 페이스</h3>
         <p class="cap" id="thr-cap"></p>
         <div class="scroll" id="thr-chart"></div>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:16px" id="tp-wrap">
+      <div class="panel">
+        <h3>훈련 페이스 — 현재 기량 기준</h3>
+        <p class="cap" id="tp-cap"></p>
+        <div class="tpwrap"><table id="tp"><thead><tr><th>구분</th><th class="num">페이스 /km</th><th class="num">심박</th><th>세션 · 근거</th></tr></thead><tbody></tbody></table></div>
+        <p class="cap" id="tp-note" style="margin-top:10px"></p>
       </div>
     </div>
   </section>
@@ -483,8 +496,8 @@ const DATA = {
   generatedAt: "2026-11-13 (Garmin 실측)",
   raceDate: "2027-11-07",   // 가정 — 11월 첫째 일요일(JTBC 통상 일정). 공식 발표 시 교체
   dDay: 359,
-  phase: "회복 12일차 / 14 · 회복 지표 경고",
-  goal: { time: "3:00", pace: "실행 4:13–4:14/km · 싱글 4:16이 여유로운 몸 · 출발점 11/1 3:17:27 PR" },
+  phase: "회복 12일차 / 14 · 회복 지표 경고 · 목표 3:09로 조정",
+  goal: { time: "3:09", pace: "목표 MP 4:29/km · 실행 4:27–4:29 · 출발점 11/1 3:17:27 PR(-8분 27초)" },
 
   // 5블록 타임라인 (일수 기준, 총 371일) · 2026-11-02 = 1일차, 2027-11-07 레이스 = 371일차
   phases: [
@@ -494,7 +507,7 @@ const DATA = {
     {n:"여름 베이스", d:91,  r:"5/31–8/29"},
     {n:"레이스 블록", d:70,  r:"8/30–11/07"},
   ],
-  elapsedDays: 12,   // 2026-11-02 = 1일차 (싱글 시즌 시작)
+  elapsedDays: 12,   // 2026-11-02 = 1일차 (시즌 시작 · 11/13 목표 sub-3 → 3:09 조정)
 
   metrics: [
     { k:"트레이닝 준비도", v:"1", unit:"", d:"POOR · HRV 낮음 · 60(11/10) → 12 → 6 → 1 · 회복 시간 48시간", status:"crit" },
@@ -518,8 +531,8 @@ const DATA = {
     {d:"9/03",v:12283},{d:"9/10",v:12264},{d:"9/17",v:12233},{d:"9/24",v:12150},
     {d:"10/01",v:12115},{d:"10/08",v:11997},{d:"10/19",v:11909},{d:"10/20",v:11891},{d:"10/22",v:11805},{d:"10/27",v:11825},{d:"11/02",v:11727},{d:"11/13",v:11719},
   ],
-  goalSec: 10800,   // 3:00:00
-  capSec:  11100,   // 3:05:00
+  goalSec: 11340,   // 3:09:00
+  capSec:  11520,   // 3:12:00
 
   vo2maxTrend: [
     {d:"5/02",v:53.3},{d:"5/18",v:54.2},{d:"6/02",v:53.5},
@@ -538,10 +551,26 @@ const DATA = {
     {k:"하프 PR",  p:271, t:"4:31", note:"1:35:17 · 2025-11"},
     {k:"풀 PR",    p:281, t:"4:41", note:"3:17:27 · 2026-11 JTBC"},
   ],
-  mpTarget: 254,   // 4:14/km (싱글 실행 MP)
+  mpTarget: 269,   // 4:29/km (3:09 목표 MP)
 
   // Garmin LT 10/21 갱신값: speed 0.3917 → 4:15/km, LTHR 161
-  threshold: { ltPace:255, ltHr:161, mpTarget:254, halfPr:271, typicalGapMin:15, typicalGapMax:25 },
+  threshold: { ltPace:255, ltHr:161, mpTarget:269, halfPr:271, typicalGapMin:15, typicalGapMax:25 },
+
+  // 훈련 페이스 — 현재 기량(VDOT 약 48) 기준 · 관문 기록이 나오면 다시 계산 · 2026-11-13 추가
+  trainingPaces: {
+    basis: "기준: 11/1 풀 3:17:27 · 10K PR 42:57 · Garmin 역치 4:15 @LTHR 161 · 예측 10K 40:35 / 하프 1:29:58 → 레이스 실측 환산 VDOT 약 48",
+    rows: [
+      {k:"회복 조깅",          p:"6:00–6:30", hr:"≤ 130",   use:"질 훈련·거리주 다음 날 30~40분. 지금 같은 회복 블록 재개 첫 주도 이 페이스"},
+      {k:"이지 조깅",          p:"5:20–5:50", hr:"120–138", use:"주간 거리의 75~80%. 11/9 5:46 @122, 11/12 5:19 @130이 이 범위의 양 끝"},
+      {k:"장거리 이지",        p:"5:10–5:35", hr:"130–145", use:"토 거리주의 기본 페이스. 후반 MP 구간 전까지"},
+      {k:"마라톤 페이스 (MP)", p:"4:28–4:32", hr:"148–155", use:"목표 3:09 = 4:29. 현재 기량 MP는 4:31~4:35. 거리주 후반 8 → 15km, 레이스 블록에서 4:27–4:29로"},
+      {k:"파틀렉 on / off",    p:"4:05–4:20 / 5:30–6:00", hr:"on 끝 158–165", use:"1~3분 on × 8~12회, off 1~2분 조깅. 하프~10K 감각. 베이스 블록의 첫 질 훈련"},
+      {k:"템포 (역치)",        p:"4:13–4:18", hr:"155–161", use:"크루즈 1.6km × 4~5(휴식 1분) 또는 연속 20~25분 @4:18. 심박 161을 넘으면 페이스를 늦춘다"},
+      {k:"인터벌 (VO₂max)",    p:"3:52–3:58", hr:"165+ 반복 끝", use:"1km × 5 또는 800m × 6, 휴식은 같은 시간 조깅. 400m는 93~95초. 화 클럽"},
+      {k:"반복 · 스트라이드",   p:"3:35–3:45", hr:"—",       use:"200m × 8(44~45초) 또는 100m 스트라이드 6개. 주 2회 이지런 끝에"},
+    ],
+    note: "목표 3:09에 필요한 몸은 역치 4:08–4:10, 인터벌 3:48–3:52, 10K 41:00, 하프 1:30이다. 관문 기록이 좋아지면 이 표를 다시 계산해 한 단계씩 올린다. 회복 지표가 재개 조건(준비도 50, HRV 51, 안정시 심박 48)을 채울 때까지는 회복 조깅만."
+  },
 
   loadBalance: [
     {k:"저강도 유산소", v:1505, min:878,  max:1931},
@@ -659,8 +688,10 @@ const DATA = {
   // 코치 코멘트 — t: good|warn|serious|crit (좌측 점 색)
   coachNote: {
     updated: "2026-11-13",
-    verdict: "회복 12일차인데 몸이 멈추라고 한다. 준비도가 사흘 연속 12 → 6 → 1이고, HRV 주간 평균은 58에서 46으로 떨어져 LOW, 안정시 심박은 51이다. 오늘(11/13)과 내일은 러닝과 근력을 모두 쉬고, 11/16 베이스 블록 시작은 아래 재개 조건을 이틀 연속 채울 때까지 미룬다.",
+    verdict: "목표를 3:09(MP 4:29)로 조정했고, 훈련 페이스표를 현재 기량 기준으로 새로 짰다. 다만 지금은 페이스보다 회복이 먼저다. 회복 12일차인데 몸이 멈추라고 한다. 준비도가 사흘 연속 12 → 6 → 1이고, HRV 주간 평균은 58에서 46으로 떨어져 LOW, 안정시 심박은 51이다. 오늘(11/13)과 내일은 러닝과 근력을 모두 쉬고, 11/16 베이스 블록 시작은 아래 재개 조건을 이틀 연속 채울 때까지 미룬다.",
     items: [
+      { t:"good", h:"목표 3:09 — 이미 있는 속도를 42km까지 늘리는 목표",
+        b:"3:09는 MP 4:29, PR 3:17:27보다 km당 12초 빠르다. 11/1 전반 20km를 4:30 @HR153로 달렸으니 속도는 이미 있다. 남은 건 30km 이후를 지키는 다리와 연료, 그리고 역치 4:15 → 4:08–4:10이다. 이지 조깅은 5:20–5:50, 템포는 4:13–4:18(HR 161 이하), 인터벌은 3:52–3:58, 파틀렉 on은 4:05–4:20이다(퍼포먼스 섹션 「훈련 페이스」 표)." },
       { t:"crit", h:"회복 지표 셋이 동시에 나빠졌다",
         b:"준비도는 11/10 60에서 11/11 12, 11/12 6, 11/13 1로 떨어졌다. HRV는 이틀 연속 41ms로 정상 하한 56과 LOW 경계 51 아래이고, 주간 평균은 11/2 58에서 46까지 내려왔다. 안정시 심박은 11/10 43에서 이틀 연속 51이다. Garmin 트레이닝 상태도 STRAINED다. 부하(ACWR 0.7, 급성 612)는 낮은데 회복이 안 된다는 뜻이라, 감기·몸살 초기일 가능성도 있다. 목 통증이나 미열이 있으면 그것부터 본다." },
       { t:"serious", h:"회복 2주를 1주 만에 끝냈다",
@@ -670,52 +701,52 @@ const DATA = {
       { t:"good", h:"체력은 그대로다 — 1주 쉬어도 잃지 않는다",
         b:"VO₂max는 55.4에서 55.9로 올랐고, 풀코스 예측은 3:15:27 → 3:15:19, 10K 40:58 → 40:35, 하프 1:30:55 → 1:29:58이다. Garmin 역치는 10/21에 4:15 @LTHR 161로 갱신돼 있었다(대시보드가 4:19로 늦게 반영하던 값을 이번에 고쳤다). 1주 쉬어서 잃는 건 거의 없고, 회복을 못 하고 베이스 블록에 들어가면 11주 블록 전체가 흔들린다." },
     ],
-    next: "금(11/13)·토(11/14): 러닝·근력 모두 쉰다. 걷기 30분까지, 23시 전에 눕고, 탄수화물과 단백질을 충분히 먹는다. 열이나 인후통이 있으면 일요일까지 쉰다. 재개 조건은 아침 기준 세 가지다: 준비도 50 이상, HRV 하룻밤 51 이상, 안정시 심박 48 이하. 셋을 채운 첫날은 30분 @6:00보다 느리게, HR 135 이하로만 뛴다. 이틀 연속 채우면 그날부터 베이스 블록을 시작한다(빨라도 11/17). 첫 주는 30~45분 이지 주 3~4회만, 트랙·인터벌은 하지 않고 화·목 클럽도 이지로만 간다. 근력은 종목을 골라 기록하고 하체 2세트부터.",
+    next: "금(11/13)·토(11/14): 러닝·근력 모두 쉰다. 걷기 30분까지, 23시 전에 눕고, 탄수화물과 단백질을 충분히 먹는다. 열이나 인후통이 있으면 일요일까지 쉰다. 재개 조건은 아침 기준 세 가지다: 준비도 50 이상, HRV 하룻밤 51 이상, 안정시 심박 48 이하. 셋을 채운 첫날은 회복 조깅 30분 @6:00–6:30, HR 130 이하로만 뛴다. 이틀 연속 채우면 그날부터 베이스 블록을 시작한다(빨라도 11/17). 첫 2주는 30~45분 이지(5:20–5:50) 주 3~4회만, 트랙·인터벌은 하지 않고 화·목 클럽도 이지로만 간다. 근력은 종목을 골라 기록하고 하체 2세트부터.",
   },
 
 
 
-  // 싱글 로드맵 — 관문·가능성(코치 추정). 관문 기록이 나오면 갱신
+  // 3:09 로드맵 — 관문·가능성(코치 추정). 2026-11-13 목표 sub-3 → 3:09 조정
   raceForecast: {
     updated: "2026-11-13",
-    labels: { title:"싱글 로드맵", nav:"로드맵", pace:"관문 — 기록으로 궤도를 판정한다", paceCol:"기준", noteCol:"의미 · 못 넘으면",
-              odds:"2027 가을 결과 가능성 (코치 추정)", basis:"현재 → 싱글 여유에 필요한 몸", decision:"이번 주 할 일",
+    labels: { title:"3:09 로드맵", nav:"로드맵", pace:"관문 — 기록으로 궤도를 판정한다", paceCol:"기준", noteCol:"의미 · 못 넘으면",
+              odds:"2027 가을 결과 가능성 (코치 추정)", basis:"현재 → 3:09에 필요한 몸", decision:"이번 주 할 일",
               stampNote:"레이스 날짜는 가정(11월 첫째 일요일)" },
-    verdict: "싱글은 1년짜리 목표다. 겨울(베이스)에 볼륨과 근력을 깔고, 봄(스피드·역치)에 10K를 39:30까지 끌어올리고, 여름에 볼륨과 역치 4:00을 만들고, 9~10월에 그 속도를 35km 후반까지 늘린다. 관문 6개 중 하나라도 크게 빗나가면 그 자리에서 목표를 다시 정한다. 지금 할 일은 회복을 끝내고 건강한 몸으로 베이스 블록에 들어가는 것이다.",
+    verdict: "목표를 3:09(MP 4:29)로 조정했다. PR 3:17:27에서 8분 27초, km당 12초다. 겨울(베이스)에 볼륨과 근력을 깔고, 봄에 10K를 41:00까지, 여름에 역치를 4:08–4:10까지 올리고, 9~10월에 4:27–4:29를 35km 후반까지 늘린다. sub-3보다 현실적인 폭이라 관문을 넘을 때마다 여유가 생긴다. 지금 할 일은 회복을 끝내고 건강하게 베이스 블록에 들어가는 것이다.",
     pacePlan: [
-      {seg:"1/30 G1",  pace:"10K 41:00", note:"베이스 블록 결과. 못 넘으면 스피드·역치 블록을 2주 늘린다. 베이스 시작이 며칠 밀려도 날짜는 유지"},
-      {seg:"4/24 G2",  pace:"10K 39:30", note:"싱글에 필요한 속도의 절반을 왔다는 뜻. 지금 PR 42:57, 예측 40:35"},
-      {seg:"5/29 G3",  pace:"하프 1:27", note:"1:29를 넘으면 가을 목표를 3:02로 조정"},
-      {seg:"8/28 G4",  pace:"역치 4:00–4:02", note:"Garmin LT 또는 30분 TT. 지금 4:15 @LTHR 161"},
-      {seg:"9/25 G5",  pace:"하프 1:24–1:25", note:"레이스 블록 중간 점검"},
-      {seg:"10/23 G6", pace:"35km 후반 15km @4:13", note:"HR 158 이하·보폭 유지면 「싱글 여유」 판정. 못 넘으면 레이스 페이스 4:16–4:18"},
+      {seg:"1/30 G1",  pace:"10K 42:00", note:"베이스 블록 결과. 지금 PR 42:57. 못 넘으면 스피드·역치 블록을 2주 늘린다"},
+      {seg:"4/24 G2",  pace:"10K 41:00", note:"3:09에 필요한 속도 확보. 40:30 이하면 목표를 3:05로 올리는 것을 검토"},
+      {seg:"5/29 G3",  pace:"하프 1:31", note:"1:33을 넘으면 가을 목표를 3:12로 조정"},
+      {seg:"8/28 G4",  pace:"역치 4:08–4:10", note:"Garmin LT 또는 30분 TT. 지금 4:15 @LTHR 161"},
+      {seg:"9/25 G5",  pace:"하프 1:29–1:30", note:"레이스 블록 중간 점검"},
+      {seg:"10/23 G6", pace:"35km 후반 15km @4:27", note:"HR 155 이하·보폭 유지면 레이스 페이스 4:27–4:28 확정. 못 넘으면 4:30–4:31(3:10~3:11)"},
     ],
-    watchNote: "「싱글이 여유롭다」의 정의: 4:16 이븐을 35km 거리주 후반 15km에서 HR 158 이하로 지키고, 보폭이 첫 10km 대비 3cm 넘게 줄지 않는다. 11/1 레이스에서는 첫 20km 114cm에서 36km 이후 104cm로 10cm 줄었다. 대회 날짜 2027-11-07은 가정값이다.",
+    watchNote: "3:09 레이스의 정의: 4:29 이븐을 42km 내내 지킨다. 그러려면 35km 거리주 후반 15km를 4:27에 HR 155 이하로, 보폭은 첫 10km 대비 3cm 넘게 줄지 않게 달릴 수 있어야 한다. 11/1 레이스에서는 첫 20km 114cm에서 36km 이후 104cm로 10cm 줄었다. 대회 날짜 2027-11-07은 가정값이다.",
     odds: [
-      {k:"sub-3 (3:00 미만)", p:25},
-      {k:"3:00–3:05",         p:35},
-      {k:"3:05–3:10",         p:25},
-      {k:"3:10 이상",          p:15},
+      {k:"3:09 미만",   p:45},
+      {k:"3:09–3:12",   p:30},
+      {k:"3:12–3:17",   p:18},
+      {k:"3:17 이상",   p:7},
     ],
-    oddsNote: "모형이 아니라 코치 판단이다. 1년에 18분을 줄이는 건 연 2,600km 러너에게 큰 폭이다. 지난 시즌은 7월 예측 3:22에서 결과 3:17:27로 약 5분 줄였다. 이번 주 회복 경고는 확률을 바꾸지 않지만, 무시하고 베이스에 들어가 부상이나 과훈련으로 번지면 가장 큰 하방 위험이 된다. 관문 G2(10K 39:30)를 넘으면 sub-3 가능성을 40% 이상으로 올린다.",
+    oddsNote: "모형이 아니라 코치 판단이다. 지난 시즌은 7월 예측 3:22에서 결과 3:17:27로 약 5분을 줄였는데, 근력과 장거리 후반 훈련이 비어 있었다. 이번에는 1년이 있고 Garmin 예측은 이미 3:15:19다. 30km 이후를 지키는 다리만 만들면 3:09는 충분히 닿는 거리다. 가장 큰 위험은 부상과 과훈련이고, 이번 주 회복 경고가 그 신호다. G2(10K 41:00)를 넘으면 3:09 미만 가능성을 60%로 올린다.",
     basis: [
-      {k:"10K",                       v:"42:57 → 38:30"},
-      {k:"하프",                      v:"1:35:17 → 1:24"},
-      {k:"역치 페이스 (LTHR 161)",    v:"4:15 → 4:00"},
-      {k:"VO₂max",                    v:"55.9 → 59+"},
-      {k:"Garmin 풀 예측",            v:"3:15:19 → 2:56"},
-      {k:"장거리 후반 페이스",         v:"5:03(36km~) → 4:13"},
+      {k:"10K",                       v:"42:57 → 41:00"},
+      {k:"하프",                      v:"1:35:17 → 1:30"},
+      {k:"역치 페이스 (LTHR 161)",    v:"4:15 → 4:08–4:10"},
+      {k:"VO₂max",                    v:"55.9 → 57+"},
+      {k:"Garmin 풀 예측",            v:"3:15:19 → 3:07"},
+      {k:"장거리 후반 페이스",         v:"5:03(36km~) → 4:27"},
       {k:"하체 근력 세트/주",          v:"1 → 6"},
     ],
     items: [
-      { t:"warn", h:"핵심 레버 1 — 역치를 15초 올린다",
-        b:"통상 마라톤 페이스는 역치보다 15~25초 느리다. 역치 4:15인 지금 적정 MP는 4:30~4:40이고, 11/1 레이스 평균 4:39가 그 안이었다. 4:13을 MP로 쓰려면 역치가 3:58~4:00이어야 한다. 그래서 주간 우선순위에서 목요일 역치를 화요일 인터벌보다 위에 둔다." },
-      { t:"warn", h:"핵심 레버 2 — 30km 이후를 지키는 다리",
-        b:"11/1 레이스 1km 분석에서 22~31km는 파워가 1%만 줄었는데 속도는 3.3% 떨어졌고(접지 219 → 225ms), 36km 이후에는 파워가 9% 줄고 보폭이 114 → 104cm로 무너졌다. 심박은 154 → 145로 오히려 내려갔다. 심폐가 아니라 다리와 연료다. 하체 근력 주 6세트, 카프·플라이오, 90분 넘는 거리주마다 젤 섭취 훈련을 시즌 내내 지킨다." },
-      { t:"good", h:"이미 가진 것 — 속도와 볼륨",
-        b:"10/17 10km 42:57 PR, 11/11 트랙 4.77km @4:13 HR144, 11/1 전반 20km 4:30 @HR153. 9월 338.7km, 10월 269.1km를 부상 없이 소화했다. 볼륨을 처음부터 쌓는 시즌이 아니라 강도를 얹는 시즌이다. 그래서 첫 2주 회복을 아낄 이유가 없다." },
+      { t:"warn", h:"핵심 레버 1 — 30km 이후를 지키는 다리",
+        b:"3:09에서 가장 큰 숙제는 속도가 아니라 후반이다. 11/1 레이스의 전반 20km는 4:30, 목표 MP 4:29와 거의 같았다. 무너진 건 그다음이다. 22~31km는 파워가 1%만 줄었는데 속도는 3.3% 떨어졌고(접지 219 → 225ms), 36km 이후에는 파워 9% 감소와 보폭 114 → 104cm가 겹쳐 5:03까지 밀렸다. 하체 근력 주 6세트, 카프·플라이오, 90분 넘는 거리주마다 젤 섭취 훈련, 거리주 후반 MP가 처방이다." },
+      { t:"warn", h:"핵심 레버 2 — 역치를 5~7초 올린다",
+        b:"통상 마라톤 페이스는 역치보다 15~25초 느리다. 역치 4:15인 지금 적정 MP는 4:30~4:40이다. 4:29를 여유 있게 가려면 역치가 4:08–4:10이어야 한다. 목요일 템포(4:13–4:18, HR 161 이하)를 시즌 내내 지키면 닿는 폭이다." },
+      { t:"good", h:"이미 가진 것 — 전반 20km는 이미 목표 페이스",
+        b:"11/1 전반 20km 1:29:56(4:30 @HR153), 10/17 10km 42:57 PR, 11/11 트랙 4.77km @4:13 HR144. 9월 338.7km, 10월 269.1km를 부상 없이 소화했다. 3:09는 새 속도를 만드는 목표가 아니라, 이미 있는 속도를 42km까지 늘리는 목표다." },
     ],
-    decision: "11/13~11/14 완전 휴식(걷기 30분까지). 재개 조건: 아침 준비도 50 이상 + HRV 51 이상 + 안정시 심박 48 이하. 채운 첫날 30분 @6:00보다 느리게 HR 135 이하. 이틀 연속 채우면 베이스 블록 시작(빨라도 11/17). 베이스 첫 주는 이지 30~45분 주 3~4회, 트랙·인터벌 없음. G1(1/30)까지 날짜는 그대로 둔다.",
+    decision: "11/13~11/14 완전 휴식(걷기 30분까지). 재개 조건: 아침 준비도 50 이상 + HRV 51 이상 + 안정시 심박 48 이하. 채운 첫날 회복 조깅 30분 @6:00–6:30, HR 130 이하. 이틀 연속 채우면 베이스 블록 시작(빨라도 11/17). 베이스 첫 2주는 이지 5:20–5:50만, 3주차부터 파틀렉(on 4:05–4:20) 주 1회를 넣는다. G1(1/30 10K 42:00)까지 날짜는 그대로 둔다.",
   },
 };
 
@@ -1186,6 +1217,15 @@ $("#mil-tiles").innerHTML = DATA.mileageStats.map(m=>`
   $("#str-legend").innerHTML = legend(groups.map(g=>({c:g.c,t:`${g.t} (목표 ${g.g})`})));
   $("#str-table").innerHTML = tbl(["주","상체","하체","코어"], data.map(d=>[d.w,d.u,d.l,d.c]));
 })();
+
+/* ── 훈련 페이스 표 ── */
+(()=>{ const tp=DATA.trainingPaces;
+  if(!tp||!tp.rows?.length){ const w=$("#tp-wrap"); if(w) w.style.display="none"; return; }
+  $("#tp-cap").textContent = tp.basis||"";
+  $("#tp tbody").innerHTML = tp.rows.map(r=>`<tr><td>${esc(r.k)}</td><td class="num">${esc(r.p)}</td><td class="num">${esc(r.hr)}</td><td>${esc(r.use)}</td></tr>`).join("");
+  $("#tp-note").textContent = tp.note||"";
+})();
+{ const m=DATA.mpTarget, c=$("#pr-cap"); if(c&&m) c.textContent=`개인 최고기록 환산 페이스 · 점선 = 목표 MP ${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}`; }
 
 /* ── 활동 표 ── */
 $("#acts tbody").innerHTML = DATA.recentActivities.map(a=>`
