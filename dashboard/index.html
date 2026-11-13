@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet">
-<title>지환 Dashboard · 3:09 sub · D-day</title>
+<title>지환 Dashboard · 3:09 sub · 진행률 / 100%</title>
 <style>
   /* ── 터미널(CRT) 컨셉 ─────────────────────────────────────────
      UI 크롬은 인광 그린 --p1 / 앰버 --p3. 둘 다 데이터 색이 아니다.
@@ -96,6 +96,7 @@
   .hero-top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 28px;margin:12px 0 4px}
   .dday{font-size:64px;font-weight:800;line-height:1;letter-spacing:-.03em;color:var(--p1);
     text-shadow:var(--glow);animation:settle 1.4s ease-out both;font-variant-numeric:tabular-nums}
+  .dday small{font-size:.3em;font-weight:700;letter-spacing:0;color:var(--ink2);text-shadow:none;white-space:nowrap}
   .hero .meta{display:flex;flex-direction:column;gap:6px;padding-bottom:4px}
   .hero .meta b{font-size:14px;font-weight:700;color:var(--ink)}
   .phasepill{display:inline-block;width:max-content;color:var(--p1);background:var(--accent-soft);
@@ -292,7 +293,7 @@
         <span class="term-meta" id="stamp"></span>
       </div>
       <div class="term-screen">
-        <div class="term-line"><span class="ps1">❯</span> <span class="cmd" id="term-goal">race --countdown --goal sub-3:09</span></div>
+        <div class="term-line"><span class="ps1">❯</span> <span class="cmd" id="term-goal">pace --progress --goal mp-4:27</span></div>
         <div class="hero-top">
           <div class="dday" id="dday"></div>
           <div class="meta">
@@ -808,19 +809,25 @@ const tbl = (head, rows) =>
   rows.map(r=>`<tr>${r.map((c,i)=>`<td${i?' class="num"':''}>${esc(c)}</td>`).join("")}</tr>`).join("")+`</tbody></table>`;
 
 /* ── 헤더 / 히어로 ── */
-$("#dday").textContent = ddl(DATA.dDay);
+// 히어로 타이틀 = 페이스 진행률(현재 기량 0% → 목표 MP 100%). D-day는 2026-11-13 삭제
+const ppOverall = (()=>{ const pp=DATA.paceProgress; if(!pp||!pp.kinds?.length) return null;
+  const r=k=>{ const t=k.start-k.target; return t<=0?100:Math.min(100,Math.max(0,(k.start-k.current)/t*100)); };
+  const v=pp.kinds.reduce((a,k)=>a+r(k),0)/pp.kinds.length;
+  return { v, txt: v>=100?"100":(Math.min(99.9,Math.floor(v*10)/10)).toFixed(1), mp: mmss(pp.mp.target) }; })();
+$("#dday").innerHTML = ppOverall
+  ? `${ppOverall.txt}%<small> / 100% · MP ${ppOverall.mp}</small>` : esc(`Sub ${DATA.goal.time}`);
 $("#racedate").textContent = `레이스 ${DATA.raceDate}`;
 $("#race-sub").textContent = `sub ${DATA.goal.time} · 주 5회`;
 // 목표 문구는 전부 DATA.goal.time / goalSec / capSec에서 파생 — 리뉴얼 후 3:07이 남아 있던 걸 2026-10-14 수정
 { const hm=v=>`${Math.floor(v/3600)}:${String(Math.round(v%3600/60)).padStart(2,"0")}`;
   $("#h1-goal").textContent = `Sub ${DATA.goal.time}`;
-  $("#term-goal").textContent = `race --countdown --goal sub-${DATA.goal.time}`;
+  $("#term-goal").textContent = `pace --progress --goal mp-${mmss(DATA.mpTarget)}`;
   $("#pred-cap").textContent = `${DATA.predictionTrend[0].d} ~ 오늘 · 목표선 ${hm(DATA.goalSec)} / 상한선 ${hm(DATA.capSec)}`; }
 { // 히어로 상태줄 · 터미널 마지막 줄 · 푸터 — 전부 DATA에서 파생(하드코딩 금지)
   const totalDays = DATA.phases.reduce((a,p)=>a+p.d,0);
   const lastPred = DATA.predictionTrend.at(-1);
   $("#hero-stats").textContent =
-    `${ddl(DATA.dDay)} · ${DATA.elapsedDays}/${totalDays}일차 · Garmin 예측 ${hms(lastPred.v)} · ACWR ${DATA.acwr.toFixed(1)}`;
+    `${ppOverall?`진행률 ${ppOverall.txt}% / 100% · `:""}${DATA.elapsedDays}/${totalDays}일차 · Garmin 예측 ${hms(lastPred.v)} · ACWR ${DATA.acwr.toFixed(1)}`;
   $("#term-foot").textContent = `phase: ${DATA.phase}`;
   $("#foot-stamp").textContent = `last sync ${DATA.generatedAt}`;
 }
@@ -1321,7 +1328,7 @@ document.querySelectorAll(".scroll").forEach(el=>{
 /* ── 대회 예상 · 결과 · 로드맵 (raceForecast, 제목은 labels로) ── */
 (function(){
   const r = DATA.raceForecast; if(!r){ $("#race").remove(); document.querySelector('a[href="#race"]')?.remove(); return; }
-  $("#rf-stamp").textContent = `${r.updated} 기준 · 목표 ${DATA.goal.time} · 레이스 ${DATA.raceDate} (${ddl(DATA.dDay)})` + (r.labels?.stampNote ? ` · ${r.labels.stampNote}` : "");
+  $("#rf-stamp").textContent = `${r.updated} 기준 · 목표 ${DATA.goal.time} · 레이스 ${DATA.raceDate}` + (r.labels?.stampNote ? ` · ${r.labels.stampNote}` : "");
   // 레이스 뒤에는 같은 섹션을 결과 리뷰로 쓴다 — 제목·열 이름은 r.labels로 덮어쓴다
   const L=r.labels||{};
   [["#rf-title","title"],["#rf-h-pace","pace"],["#rf-h-pcol","paceCol"],["#rf-h-ncol","noteCol"],["#rf-h-odds","odds"],["#rf-h-basis","basis"]]
@@ -1347,7 +1354,7 @@ document.querySelectorAll(".scroll").forEach(el=>{
   const md=document.getElementById("meta-desc");
   // 목표 시간은 DATA.goal.time에서 파생한다. 하드코딩하면 목표를 바꿀 때 탭 제목과 meta가 거짓말을 한다(2026-10-12 수정).
   if(md) md.setAttribute("content", `${DATA.raceDate} 풀코스 sub ${DATA.goal.time} 대시보드 · Garmin 실측`);
-  document.title = `지환 Dashboard · ${DATA.goal.time} sub · ${ddl(DATA.dDay)}`;
+  document.title = `지환 Dashboard · ${DATA.goal.time} sub · ${ppOverall?`진행률 ${ppOverall.txt}% / 100%`:`MP ${mmss(DATA.mpTarget)}`}`;
   const wv=DATA.weeklyVolume||[];
   if(wv.length) $("#vol-cap").textContent =
     `최근 ${wv.length}주 · 질 = 무산소TE ≥ 1.5 또는 평균 4:50/km 이내 · 흐린 막대(${wv[wv.length-1].w})는 진행 중, 평균선에서 제외`;
