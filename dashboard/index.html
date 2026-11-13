@@ -160,6 +160,22 @@
   #tp td.num{white-space:nowrap}
   #tp td:last-child{color:var(--ink2);line-height:1.5}
   .tpwrap{overflow-x:auto;max-width:100%}
+  .pp-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:0 0 8px}
+  .pp-top b{font-size:clamp(1.5rem,5vw,2rem);font-weight:800;color:var(--p1);font-variant-numeric:tabular-nums}
+  .pp-top span{font-size:12px;color:var(--ink2)}
+  .pp-bar{height:10px;border-radius:3px;background:var(--grid);overflow:hidden}
+  .pp-bar i{display:block;height:100%;background:var(--c,var(--p1))}
+  .pp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+  @media(max-width:900px){.pp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:460px){.pp-grid{grid-template-columns:1fr}}
+  .pp-card{border:1px solid var(--c);border-radius:8px;padding:10px 12px 12px;background:var(--card2);min-width:0}
+  .pp-card .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .pp-card .tag{background:var(--c);color:var(--bg);font-weight:800;font-size:12px;padding:2px 8px;border-radius:4px;white-space:nowrap}
+  .pp-card .pct{color:var(--c);font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums}
+  .pp-card .row{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink2);margin-top:6px;font-variant-numeric:tabular-nums}
+  .pp-card .row b{color:var(--ink);font-weight:700}
+  .pp-card .cond{font-size:11px;color:var(--ink3);margin-top:6px}
+  .pp-hist{font-size:11.5px;color:var(--ink3);margin:12px 0 0}
   @media(max-width:600px){#tp td:last-child{font-size:11.5px;min-width:150px}#tp td,#tp th{padding:6px 4px}#tp td:first-child,#tp td.num{white-space:normal}}
   table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
   th{color:var(--ink3);font-weight:500;text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em}
@@ -326,6 +342,16 @@
         <h3>역치 대비 목표 페이스</h3>
         <p class="cap" id="thr-cap"></p>
         <div class="scroll" id="thr-chart"></div>
+      </div>
+    </div>
+    <div class="grid one" style="margin-top:16px" id="pp-wrap">
+      <div class="panel">
+        <h3>페이스 진행률 — 현재 기량 0% → MP 4:27 100%</h3>
+        <p class="cap" id="pp-cap"></p>
+        <div class="pp-top"><b id="pp-all"></b><span id="pp-mp"></span></div>
+        <div class="pp-bar"><i id="pp-allbar"></i></div>
+        <div class="pp-grid" id="pp-grid"></div>
+        <p class="pp-hist" id="pp-hist"></p>
       </div>
     </div>
     <div class="grid one" style="margin-top:16px" id="tp-wrap">
@@ -497,7 +523,7 @@ const DATA = {
   raceDate: "2027-11-07",   // 가정 — 11월 첫째 일요일(JTBC 통상 일정). 공식 발표 시 교체
   dDay: 359,
   phase: "회복 12일차 / 14 · 회복 지표 경고 · 목표 3:09로 조정",
-  goal: { time: "3:09", pace: "목표 MP 4:29/km · 실행 4:27–4:29 · 출발점 11/1 3:17:27 PR(-8분 27초)" },
+  goal: { time: "3:09", pace: "목표 MP 4:27/km · 완주 3:09(평균 4:29 이내) · 출발점 11/1 3:17:27 PR(-8분 27초)" },
 
   // 5블록 타임라인 (일수 기준, 총 371일) · 2026-11-02 = 1일차, 2027-11-07 레이스 = 371일차
   phases: [
@@ -551,10 +577,10 @@ const DATA = {
     {k:"하프 PR",  p:271, t:"4:31", note:"1:35:17 · 2025-11"},
     {k:"풀 PR",    p:281, t:"4:41", note:"3:17:27 · 2026-11 JTBC"},
   ],
-  mpTarget: 269,   // 4:29/km (3:09 목표 MP)
+  mpTarget: 267,   // 4:27/km (목표 MP · 완주 3:09는 평균 4:29 이내)
 
   // Garmin LT 10/21 갱신값: speed 0.3917 → 4:15/km, LTHR 161
-  threshold: { ltPace:255, ltHr:161, mpTarget:269, halfPr:271, typicalGapMin:15, typicalGapMax:25 },
+  threshold: { ltPace:255, ltHr:161, mpTarget:267, halfPr:271, typicalGapMin:15, typicalGapMax:25 },
 
   // 훈련 페이스 — 현재 기량(VDOT 약 48) 기준 · 관문 기록이 나오면 다시 계산 · 2026-11-13 추가
   trainingPaces: {
@@ -566,13 +592,26 @@ const DATA = {
       {k:"롱런 · 프로그레션",   p:"5:30 → 4:45", hr:"마지막 155 이하", use:"25~30km. 5km마다 10초씩 올려 마지막 5km 4:40–4:50. 스피드·역치 블록에 격주"},
       {k:"롱런 · 후반 MP",      p:"5:15 → 4:28–4:32", hr:"MP 구간 148–155", use:"28km(후반 8km MP) → 35km(후반 15km MP). 여름 베이스~레이스 블록. 보폭·접지 시간 유지가 판정 기준"},
       {k:"롱런 · 패스트 피니시", p:"5:15 → 4:20–4:25", hr:"마지막 158 이하", use:"24~28km의 마지막 3~5km를 MP보다 5~10초 빠르게. 지친 다리로 속도 내는 연습"},
-      {k:"마라톤 페이스 (MP)", p:"4:28–4:32", hr:"148–155", use:"목표 3:09 = 4:29. 현재 기량 MP는 4:31~4:35. 거리주 후반 8 → 15km, 레이스 블록에서 4:27–4:29로"},
-      {k:"파틀렉 on / off",    p:"4:05–4:20 / 5:30–6:00", hr:"on 끝 158–165", use:"1~3분 on × 8~12회, off 1~2분 조깅. 하프~10K 감각. 베이스 블록의 첫 질 훈련"},
+      {k:"마라톤 페이스 (MP)", p:"4:27–4:32", hr:"148–155", use:"목표 MP 4:27. 완주 3:09는 평균 4:29 이내라 2초를 후반 처짐에 남긴다. 현재 기량 MP는 4:31~4:35. 거리주 후반 8 → 15km, 레이스 블록에서 4:27로"},
+      {k:"파틀렉 (언덕)",      p:"6:46 → 6:26", hr:"오르막 끝 145 안팎", use:"언덕 오르기 훈련(트레일). 기준은 10/18 트레일 7.01km · 상승 168m의 언덕 랩(km당 상승 43~46m) 평균 6:46. 같은 코스 같은 랩으로 비교한다"},
       {k:"템포 (역치)",        p:"4:13–4:18", hr:"155–161", use:"크루즈 1.6km × 4~5(휴식 1분) 또는 연속 20~25분 @4:18. 심박 161을 넘으면 페이스를 늦춘다"},
-      {k:"인터벌 (VO₂max)",    p:"3:52–3:58", hr:"165+ 반복 끝", use:"1km × 5 또는 800m × 6, 휴식은 같은 시간 조깅. 400m는 93~95초. 화 클럽"},
+      {k:"인터벌 (트랙)",      p:"4:14 → 4:01", hr:"평균 144 · 최고 160", use:"화 클럽 트랙. 기준은 11/11 트랙 4770m 평균 4:14(휴식 제외). 질 구간 합계 4.5km 이상의 평균으로 비교한다"},
       {k:"반복 · 스트라이드",   p:"3:35–3:45", hr:"—",       use:"200m × 8(44~45초) 또는 100m 스트라이드 6개. 주 2회 이지런 끝에"},
     ],
-    note: "목표 3:09에 필요한 몸은 역치 4:08–4:10, 인터벌 3:48–3:52, 10K 41:00, 하프 1:30이다. 관문 기록이 좋아지면 이 표를 다시 계산해 한 단계씩 올린다. 회복 지표가 재개 조건(준비도 50, HRV 51, 안정시 심박 48)을 채울 때까지는 회복 조깅만."
+    note: "목표 3:09에 필요한 몸은 역치 4:08–4:10, 인터벌 3:48–3:52, 10K 41:00, 하프 1:30이다. 파틀렉·인터벌 행은 처방 범위가 아니라 실측 세션 평균이고, 화살표 오른쪽이 MP 4:27 기량에 해당하는 값이다(페이스 진행률과 같은 기준). 관문 기록이 좋아지면 이 표를 다시 계산해 한 단계씩 올린다. 회복 지표가 재개 조건(준비도 50, HRV 51, 안정시 심박 48)을 채울 때까지는 회복 조깅만."
+  },
+
+  // 페이스 진행률 — ~/dev/marathon-coach/pace-progress.json 사본(패널 mod의 원본). 0% = 현재 기량(11/1 풀 3:17:27, MP 4:41), 100% = MP 4:27
+  paceProgress: {
+    asOf: "2026-11-13",
+    mp: { start: 281, target: 267 },
+    kinds: [
+      { id: "jog", label: "조깅", start: 320, current: 320, target: 304, hrCap: 142 },
+      { id: "fartlek", label: "파틀렉 (언덕)", start: 406, current: 406, target: 386 },
+      { id: "interval", label: "인터벌", start: 254, current: 254, target: 241 },
+      { id: "long", label: "롱런", start: 310, current: 310, target: 295, hrCap: 142 },
+    ],
+    history: [],
   },
 
   loadBalance: [
@@ -691,7 +730,7 @@ const DATA = {
   // 코치 코멘트 — t: good|warn|serious|crit (좌측 점 색)
   coachNote: {
     updated: "2026-11-13",
-    verdict: "목표를 3:09(MP 4:29)로 조정했고, 훈련 페이스표를 현재 기량 기준으로 새로 짰다. 다만 지금은 페이스보다 회복이 먼저다. 회복 12일차인데 몸이 멈추라고 한다. 준비도가 사흘 연속 12 → 6 → 1이고, HRV 주간 평균은 58에서 46으로 떨어져 LOW, 안정시 심박은 51이다. 오늘(11/13)과 내일은 러닝과 근력을 모두 쉬고, 11/16 베이스 블록 시작은 아래 재개 조건을 이틀 연속 채울 때까지 미룬다.",
+    verdict: "목표를 3:09(목표 MP 4:27)로 조정했고, 훈련 페이스표를 현재 기량 기준으로 새로 짰다. 다만 지금은 페이스보다 회복이 먼저다. 회복 12일차인데 몸이 멈추라고 한다. 준비도가 사흘 연속 12 → 6 → 1이고, HRV 주간 평균은 58에서 46으로 떨어져 LOW, 안정시 심박은 51이다. 오늘(11/13)과 내일은 러닝과 근력을 모두 쉬고, 11/16 베이스 블록 시작은 아래 재개 조건을 이틀 연속 채울 때까지 미룬다.",
     items: [
       { t:"good", h:"목표 3:09 — 이미 있는 속도를 42km까지 늘리는 목표",
         b:"3:09는 MP 4:29, PR 3:17:27보다 km당 12초 빠르다. 11/1 전반 20km를 4:30 @HR153로 달렸으니 속도는 이미 있다. 남은 건 30km 이후를 지키는 다리와 연료, 그리고 역치 4:15 → 4:08–4:10이다. 이지 조깅은 5:20–5:50, 템포는 4:13–4:18(HR 161 이하), 인터벌은 3:52–3:58, 파틀렉 on은 4:05–4:20이다(퍼포먼스 섹션 「훈련 페이스」 표)." },
@@ -715,7 +754,7 @@ const DATA = {
     labels: { title:"3:09 로드맵", nav:"로드맵", pace:"관문 — 기록으로 궤도를 판정한다", paceCol:"기준", noteCol:"의미 · 못 넘으면",
               odds:"2027 가을 결과 가능성 (코치 추정)", basis:"현재 → 3:09에 필요한 몸", decision:"이번 주 할 일",
               stampNote:"레이스 날짜는 가정(11월 첫째 일요일)" },
-    verdict: "목표를 3:09(MP 4:29)로 조정했다. PR 3:17:27에서 8분 27초, km당 12초다. 겨울(베이스)에 볼륨과 근력을 깔고, 봄에 10K를 41:00까지, 여름에 역치를 4:08–4:10까지 올리고, 9~10월에 4:27–4:29를 35km 후반까지 늘린다. sub-3보다 현실적인 폭이라 관문을 넘을 때마다 여유가 생긴다. 지금 할 일은 회복을 끝내고 건강하게 베이스 블록에 들어가는 것이다.",
+    verdict: "목표를 3:09(목표 MP 4:27 · 평균 4:29 이내)로 조정했다. PR 3:17:27에서 8분 27초, km당 12초다. 겨울(베이스)에 볼륨과 근력을 깔고, 봄에 10K를 41:00까지, 여름에 역치를 4:08–4:10까지 올리고, 9~10월에 4:27–4:29를 35km 후반까지 늘린다. sub-3보다 현실적인 폭이라 관문을 넘을 때마다 여유가 생긴다. 지금 할 일은 회복을 끝내고 건강하게 베이스 블록에 들어가는 것이다.",
     pacePlan: [
       {seg:"1/30 G1",  pace:"10K 42:00", note:"베이스 블록 결과. 지금 PR 42:57. 못 넘으면 스피드·역치 블록을 2주 늘린다"},
       {seg:"4/24 G2",  pace:"10K 41:00", note:"3:09에 필요한 속도 확보. 40:30 이하면 목표를 3:05로 올리는 것을 검토"},
@@ -1219,6 +1258,32 @@ $("#mil-tiles").innerHTML = DATA.mileageStats.map(m=>`
   $("#str-chart").innerHTML=s+"</svg>";
   $("#str-legend").innerHTML = legend(groups.map(g=>({c:g.c,t:`${g.t} (목표 ${g.g})`})));
   $("#str-table").innerHTML = tbl(["주","상체","하체","코어"], data.map(d=>[d.w,d.u,d.l,d.c]));
+})();
+
+/* ── 페이스 진행률 (현재 기량 0% → 목표 MP 100%, 1초씩 당겨 커버) ── */
+(()=>{ const pp=DATA.paceProgress, w=$("#pp-wrap");
+  if(!pp||!pp.kinds?.length){ if(w) w.style.display="none"; return; }
+  const tint={jog:"--p1",fartlek:"--p3",interval:"--red",long:"--s3"};
+  const ratio=k=>{ const t=k.start-k.target; return t<=0?100:Math.min(100,Math.max(0,(k.start-k.current)/t*100)); };
+  const pct=v=>v>=100?"100":(Math.min(99.9,Math.floor(v*10)/10)).toFixed(1);
+  const all=pp.kinds.reduce((a,k)=>a+ratio(k),0)/pp.kinds.length;
+  const mpNow=Math.round(pp.mp.start-(pp.mp.start-pp.mp.target)*all/100);
+  $("#pp-cap").textContent=`${pp.asOf} 기준 · 0% = 현재 기량(MP ${mmss(pp.mp.start)}) · 100% = MP ${mmss(pp.mp.target)} · 제안 페이스를 커버할 때마다 1초씩 당긴다`;
+  $("#pp-all").textContent=`${pct(all)}%`;
+  $("#pp-mp").textContent=`환산 MP ${mmss(mpNow)} → 목표 ${mmss(pp.mp.target)}`;
+  $("#pp-allbar").style.width=`${all}%`;
+  $("#pp-grid").innerHTML=pp.kinds.map(k=>{
+    const total=Math.max(0,k.start-k.target), left=Math.max(0,k.current-k.target), done=total-left, r=ratio(k);
+    return `<div class="pp-card" style="--c:var(${tint[k.id]||"--p1"})">
+      <div class="hd"><span class="tag">${esc(k.label)}</span><span class="pct">${pct(r)}%</span></div>
+      <div class="pp-bar"><i style="width:${r}%"></i></div>
+      <div class="row"><span>현재 <b>${mmss(k.current)}</b></span><span>${left?`제안 <b>${mmss(k.current-1)}</b>`:"달성"}</span></div>
+      <div class="row"><span>목표 <b>${mmss(k.target)}</b></span><span>${done}/${total}초</span></div>
+      ${k.hrCap?`<div class="cond">인정 조건: 평균 심박 ${esc(k.hrCap)} 이하</div>`:""}
+    </div>`; }).join("");
+  const name=id=>pp.kinds.find(k=>k.id===id)?.label||id;
+  const h=(pp.history||[]).slice(-3).reverse();
+  $("#pp-hist").textContent=h.length?"최근 커버: "+h.map(o=>`${o.date} ${name(o.id)} ${mmss(o.pace)}`).join(" · "):"최근 커버: 아직 없음";
 })();
 
 /* ── 훈련 페이스 표 ── */
