@@ -275,7 +275,7 @@
   <header class="topbar">
     <span class="brand"><b>jihwan</b>-marathon.sh<span class="cur" aria-hidden="true"></span></span>
     <nav class="nav" aria-label="섹션 이동">
-      <a href="#perf">퍼포먼스</a><a href="#load">로드</a><a href="#mileage">마일리지</a>
+      <a href="#pp-wrap">페이스</a><a href="#perf">퍼포먼스</a><a href="#load">로드</a><a href="#mileage">마일리지</a>
       <a href="#recovery">회복</a><a href="#strength">근력</a><a href="#acts-sec">활동</a><a href="#coach">코치</a><a href="#race">대회</a>
     </nav>
   </header>
@@ -314,6 +314,20 @@
     </div>
   </section>
 
+  <section class="sec" id="pp-wrap">
+    <h2>페이스 진행률<span class="n">PACE</span></h2>
+    <div class="grid one">
+      <div class="panel">
+        <h3>현재 기량 0% → MP 4:27 100%</h3>
+        <p class="cap" id="pp-cap"></p>
+        <div class="pp-top"><b id="pp-all"></b><span id="pp-mp"></span></div>
+        <div class="pp-bar"><i id="pp-allbar"></i></div>
+        <div class="pp-grid" id="pp-grid"></div>
+        <p class="pp-hist" id="pp-hist"></p>
+      </div>
+    </div>
+  </section>
+
   <section class="tiles" id="tiles"></section>
 
   <section class="sec" id="perf">
@@ -343,16 +357,6 @@
         <h3>역치 대비 목표 페이스</h3>
         <p class="cap" id="thr-cap"></p>
         <div class="scroll" id="thr-chart"></div>
-      </div>
-    </div>
-    <div class="grid one" style="margin-top:16px" id="pp-wrap">
-      <div class="panel">
-        <h3>페이스 진행률 — 현재 기량 0% → MP 4:27 100%</h3>
-        <p class="cap" id="pp-cap"></p>
-        <div class="pp-top"><b id="pp-all"></b><span id="pp-mp"></span></div>
-        <div class="pp-bar"><i id="pp-allbar"></i></div>
-        <div class="pp-grid" id="pp-grid"></div>
-        <p class="pp-hist" id="pp-hist"></p>
       </div>
     </div>
     <div class="grid one" style="margin-top:16px" id="tp-wrap">
@@ -1269,7 +1273,7 @@ $("#mil-tiles").innerHTML = DATA.mileageStats.map(m=>`
 
 /* ── 페이스 진행률 (현재 기량 0% → 목표 MP 100%, 1초씩 당겨 커버) ── */
 (()=>{ const pp=DATA.paceProgress, w=$("#pp-wrap");
-  if(!pp||!pp.kinds?.length){ if(w) w.style.display="none"; return; }
+  if(!pp||!pp.kinds?.length){ if(w) w.style.display="none"; document.querySelector('a[href="#pp-wrap"]')?.remove(); return; }
   const tint={jog:"--p1",fartlek:"--p3",interval:"--red",long:"--s3"};
   const ratio=k=>{ const t=k.start-k.target; return t<=0?100:Math.min(100,Math.max(0,(k.start-k.current)/t*100)); };
   const pct=v=>v>=100?"100":(Math.min(99.9,Math.floor(v*10)/10)).toFixed(1);
