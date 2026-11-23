@@ -891,9 +891,11 @@ const tbl = (head, rows) =>
 const ppOverall = (()=>{ const pp=DATA.paceProgress; if(!pp||!pp.kinds?.length) return null;
   const r=k=>{ const t=k.start-k.target; return t<=0?100:Math.min(100,Math.max(0,(k.start-k.current)/t*100)); };
   const v=pp.kinds.reduce((a,k)=>a+r(k),0)/pp.kinds.length;
-  return { v, txt: v>=100?"100":(Math.min(99.9,Math.floor(v*10)/10)).toFixed(1), mp: mmss(pp.mp.target) }; })();
+  // 현재 MP = 진행률을 0%(mp.start) → 100%(mp.target) 선형으로 환산한 값
+  const cur = Math.round(pp.mp.start - (pp.mp.start-pp.mp.target)*Math.min(100,v)/100);
+  return { v, txt: v>=100?"100":(Math.min(99.9,Math.floor(v*10)/10)).toFixed(1), mp: mmss(pp.mp.target), cur: mmss(cur) }; })();
 $("#dday").innerHTML = ppOverall
-  ? `${ppOverall.txt}%<small> / 100% · MP ${ppOverall.mp}</small>` : esc(`Sub ${DATA.goal.time}`);
+  ? `${ppOverall.txt}%<small> / 100% · 현재 MP ${ppOverall.cur} → 목표 MP ${ppOverall.mp}</small>` : esc(`Sub ${DATA.goal.time}`);
 $("#racedate").textContent = `레이스 ${DATA.raceDate}`;
 $("#race-sub").textContent = `sub ${DATA.goal.time} · 주 5회`;
 // 목표 문구는 전부 DATA.goal.time / goalSec / capSec에서 파생 — 리뉴얼 후 3:07이 남아 있던 걸 2026-10-14 수정
